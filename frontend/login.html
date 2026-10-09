@@ -3,50 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | JalSanjeevani</title>
+  <title>Portal Access | JalSanjeevani</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/login.css">
-  
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="login-page">
 
-  <!-- Background Nav just for logo -->
-  <nav style="position: absolute; background: transparent; border: none;">
-    <div class="logo">
-      <img src="assets/logo.jpg" alt="JalSanjeevani Logo" style="height: 48px; border-radius: 6px;">
+  <!-- Top Navigation -->
+  <nav class="login-top-nav">
+    <a href="index.html" class="login-brand">
+      <img src="assets/logo.jpg" alt="JalSanjeevani Logo">
+      <span class="brand-title" style="color: #fff; font-weight: 700;">JalSanjeevani</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <select id="langSwitcher" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" aria-label="Language Selector">
+        <option value="en">English</option>
+        <option value="mr">मराठी</option>
+        <option value="hi">हिंदी</option>
+      </select>
+      <a href="index.html" class="btn btn-outline btn-sm">← Back Home</a>
     </div>
   </nav>
 
+  <!-- Login Container -->
   <div class="login-container">
     <div class="login-card glass-panel">
       
       <div class="login-header">
-        <h2>Secure Portal</h2>
-        <p>Sign in to access your dashboard</p>
+        <div class="login-badge">
+          <span>●</span> Sate &amp; District Governance
+        </div>
+        <h2>Operational Portal</h2>
+        <p>Select your authorized role or sign in with government credentials</p>
       </div>
 
+      <!-- Quick Role Selection Grid for Instant Testing -->
+      <div class="role-grid">
+        <div class="role-btn" id="btnRoleCollector" data-role="collector">
+          <span class="role-icon">🛰️</span>
+          <span class="role-name">Collector</span>
+          <span class="role-desc">Disaster Feed</span>
+        </div>
+        <div class="role-btn" id="btnRoleDriver" data-role="driver">
+          <span class="role-icon">🚛</span>
+          <span class="role-name">Driver PWA</span>
+          <span class="role-desc">GPS &amp; Crypto QR</span>
+        </div>
+        <div class="role-btn" id="btnRolePanchayat" data-role="panchayat">
+          <span class="role-icon">📱</span>
+          <span class="role-name">Panchayat</span>
+          <span class="role-desc">QR Verify</span>
+        </div>
+      </div>
+
+      <div class="divider">OR SIGN IN MANUALLY</div>
+
+      <!-- Official Sign In Form -->
       <form id="loginForm">
         <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" class="form-control" placeholder="user@jalsanjeevani.gov.in" required>
+          <label for="email">Government Service Email</label>
+          <input type="email" id="email" class="form-control" placeholder="collector@sinnar.jalsanjeevani.gov.in" required value="collector@sinnar.jalsanjeevani.gov.in">
         </div>
         
         <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          <label for="password">Cryptographic Access Key / Password</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••••••" required value="sovereign_water_2025">
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        <button type="submit" id="btnSubmitLogin" class="btn btn-primary btn-block">
+          Authorize &amp; Enter Dashboard →
+        </button>
       </form>
 
-      <a href="index.html" class="back-link">← Back to Project Info</a>
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="index.html" class="back-link">
+          <span>←</span> Return to JalSanjeevani Overview
+        </a>
+      </div>
     </div>
   </div>
 
+  <script src="js/lang.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

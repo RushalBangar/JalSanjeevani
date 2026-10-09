@@ -48,11 +48,11 @@
         </div>
       </div>
       <nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary-container font-semibold">
-        <a aria-current="page" class="transition-colors text-primary-container font-semibold" href="#hero">Features</a>
-        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" href="#tech-section">Technology</a>
-        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" href="#pillars-section">Pillars</a>
-        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" href="dashboard.html">Telemetry Live</a>
-        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" href="#impact-section">Impact</a>
+        <a aria-current="page" class="transition-colors text-primary-container font-semibold" data-i18n="nav_features" href="#hero">Features</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-i18n="nav_tech" href="#tech-section">Technology</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-i18n="nav_pillars" href="#pillars-section">Pillars</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-i18n="nav_telemetry" href="dashboard.html">Telemetry Live</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-i18n="nav_impact" href="#impact-section">Impact</a>
       </nav>
       <div class="flex items-center gap-space-sm">
         <div class="relative hidden sm:block">
@@ -64,7 +64,7 @@
           <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">expand_more</span>
         </div>
         <a class="hidden sm:inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-text-primary transition-all" data-i18n="nav_login" href="login.html">Portal Login</a>
-        <a class="inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-primary-container text-on-primary-container hover:bg-tertiary-container hover:text-on-tertiary-container shadow-[0_0_16px_rgba(0,229,255,0.25)] transition-all" href="dashboard.html">Access Dashboard</a>
+        <a class="inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-primary-container text-on-primary-container hover:bg-tertiary-container hover:text-on-tertiary-container shadow-[0_0_16px_rgba(0,229,255,0.25)] transition-all" data-i18n="nav_dashboard" href="dashboard.html">Access Dashboard</a>
         <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-1">
           <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
         </div>
@@ -73,16 +73,24 @@
         </button>
       </div>
     </div>
-    <!-- Mobile dropdown drawer -->
+    <!-- Mobile dropdown drawer with language selector -->
     <div id="mobileMenu" class="hidden lg:hidden px-6 py-4 bg-surface-slate border-b border-surface-container-high flex flex-col gap-3">
-      <a class="py-1 text-primary-container font-semibold" href="#hero">Features</a>
-      <a class="py-1 text-on-surface-variant hover:text-on-surface" href="#tech-section">Technology</a>
-      <a class="py-1 text-on-surface-variant hover:text-on-surface" href="#pillars-section">Pillars</a>
-      <a class="py-1 text-on-surface-variant hover:text-on-surface" href="dashboard.html">Telemetry Live</a>
-      <a class="py-1 text-on-surface-variant hover:text-on-surface" href="#impact-section">Impact</a>
+      <div class="flex justify-between items-center pb-2 border-b border-surface-container">
+        <span class="text-xs font-mono text-text-muted">Language / भाषा:</span>
+        <select aria-label="Language Selector" class="lang-switcher bg-surface-container text-on-surface text-xs rounded px-2 py-1">
+          <option value="en">English</option>
+          <option value="mr">मराठी</option>
+          <option value="hi">हिंदी</option>
+        </select>
+      </div>
+      <a class="py-1 text-primary-container font-semibold" data-i18n="nav_features" href="#hero">Features</a>
+      <a class="py-1 text-on-surface-variant hover:text-on-surface" data-i18n="nav_tech" href="#tech-section">Technology</a>
+      <a class="py-1 text-on-surface-variant hover:text-on-surface" data-i18n="nav_pillars" href="#pillars-section">Pillars</a>
+      <a class="py-1 text-on-surface-variant hover:text-on-surface" data-i18n="nav_telemetry" href="dashboard.html">Telemetry Live</a>
+      <a class="py-1 text-on-surface-variant hover:text-on-surface" data-i18n="nav_impact" href="#impact-section">Impact</a>
       <div class="pt-2 border-t border-surface-container flex justify-between items-center">
-        <a class="text-primary font-semibold text-sm" href="login.html">Portal Login</a>
-        <a class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container text-xs font-semibold" href="dashboard.html">Dashboard</a>
+        <a class="text-primary font-semibold text-sm" data-i18n="nav_login" href="login.html">Portal Login</a>
+        <a class="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container text-xs font-semibold" data-i18n="nav_dashboard" href="dashboard.html">Dashboard</a>
       </div>
     </div>
   </header>
@@ -540,10 +548,10 @@
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-space-sm z-10">
-              <a class="px-6 py-3.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-semibold shadow-md hover:bg-tertiary-container hover:text-on-tertiary-container transition-all" data-path="login" href="login.html">
+              <a class="px-6 py-3.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-semibold shadow-md hover:bg-tertiary-container hover:text-on-tertiary-container transition-all" href="login.html">
                 Access Command Terminal
               </a>
-              <a class="px-6 py-3.5 rounded-lg bg-surface-container-high text-on-surface hover:text-text-primary font-headline-sm text-headline-sm font-semibold transition-all" data-path="impact" href="#">
+              <a class="px-6 py-3.5 rounded-lg bg-surface-container-high text-on-surface hover:text-text-primary font-headline-sm text-headline-sm font-semibold transition-all" href="#impact-section">
                 View Audit Log
               </a>
             </div>
@@ -587,18 +595,19 @@
         <div>
           <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider block mb-3">Navigation</span>
           <ul class="space-y-2 font-body-sm text-body-sm">
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="landing" href="#">Mission Overview</a></li>
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="technology" href="#">Satellite Integration</a></li>
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="telemetry-live" href="#">Hydrological Telemetry</a></li>
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="impact" href="#">Audit &amp; Transparency</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="#hero">Mission Overview</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="#tech-section">Satellite Integration</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="dashboard.html">Hydrological Telemetry</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="#impact-section">Audit &amp; Transparency</a></li>
           </ul>
         </div>
         <div>
           <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider block mb-3">Institutional Governance</span>
           <ul class="space-y-2 font-body-sm text-body-sm">
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="pillars" href="#">State Water Protocols</a></li>
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="dashboard-overview" href="dashboard.html">Civil Supply Verification</a></li>
-            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="login" href="login.html">Collectorate Terminal</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="#pillars-section">State Water Protocols</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="panchayat.html">Civil Supply Verification (Panchayat)</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="driver.html">Tanker Logistics Portal (Driver)</a></li>
+            <li><a class="hover:text-on-surface transition-colors" href="dashboard.html">Collectorate Terminal</a></li>
           </ul>
         </div>
         <div>

@@ -2,6 +2,12 @@ const translations = {
   en: {
     hero_badge: "AI-Powered Scarcity Prediction",
     nav_login: "Portal Login",
+    nav_features: "Features",
+    nav_tech: "Technology",
+    nav_pillars: "Pillars",
+    nav_telemetry: "Telemetry Live",
+    nav_impact: "Impact",
+    nav_dashboard: "Access Dashboard",
     hero_title: "Smart Operations for Sustainable Drought Relief",
     hero_desc: "JalSanjeevani (जलसंजीवनी) is an end-to-end intelligent platform that predicts regional water scarcity, stops tanker diversion via cryptographic validation, and optimizes delivery routes to ensure equitable access for both humans and livestock.",
     hero_btn_discover: "Discover the Pillars",
@@ -17,6 +23,12 @@ const translations = {
   mr: {
     hero_badge: "एआय (AI) द्वारे पाणीटंचाईचा अंदाज",
     nav_login: "पोर्टल लॉगिन",
+    nav_features: "वैशिष्ट्ये",
+    nav_tech: "तंत्रज्ञान",
+    nav_pillars: "प्रकल्पाचे स्तंभ",
+    nav_telemetry: "थेट टेलिमेट्री",
+    nav_impact: "सामाजिक प्रभाव",
+    nav_dashboard: "कमांड डॅशबोर्ड",
     hero_title: "शाश्वत दुष्काळ निवारणासाठी स्मार्ट ऑपरेशन्स",
     hero_desc: "जलसंजीवनी हे एक बुद्धिमान तंत्रज्ञान आहे जे दुष्काळाची १४ दिवस आधी पूर्वसूचना देते, क्यूआर (QR) पडताळणीद्वारे टँकर माफियांची चोरी थांबवते आणि माणसे व जनावरे दोघांनाही समान पाणीवाटप सुनिश्चित करते.",
     hero_btn_discover: "प्रकल्पाची माहिती घ्या",
@@ -32,6 +44,12 @@ const translations = {
   hi: {
     hero_badge: "एआई (AI) द्वारा जल संकट की भविष्यवाणी",
     nav_login: "पोर्टल लॉगिन",
+    nav_features: "विशेषताएं",
+    nav_tech: "तकनीक",
+    nav_pillars: "मुख्य स्तंभ",
+    nav_telemetry: "लाइव टेलीमेट्री",
+    nav_impact: "सामाजिक प्रभाव",
+    nav_dashboard: "कमांड डैशबोर्ड",
     hero_title: "स्थायी सूखा राहत के लिए स्मार्ट ऑपरेशन्स",
     hero_desc: "जलसंजीवनी (JalSanjeevani) एक इंटेलिजेंट प्लेटफॉर्म है जो 14 दिन पहले पानी के संकट की भविष्यवाणी करता है, क्रिप्टोग्राफ़िक सत्यापन के माध्यम से टैंकर माफिया को रोकता है, और मनुष्यों और पशुओं दोनों के लिए उचित जल वितरण सुनिश्चित करता है।",
     hero_btn_discover: "प्रोजेक्ट के बारे में जानें",
@@ -47,17 +65,21 @@ const translations = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const langSwitcher = document.getElementById("langSwitcher");
+  const switchers = document.querySelectorAll("#langSwitcher, .lang-switcher, select[aria-label='Language Selector']");
   const savedLang = localStorage.getItem("jalsanjeevani_lang") || "en";
 
-  if (langSwitcher) {
-    langSwitcher.value = savedLang;
-    langSwitcher.addEventListener("change", (e) => {
+  switchers.forEach((switcher) => {
+    switcher.value = savedLang;
+    switcher.addEventListener("change", (e) => {
       const selectedLang = e.target.value;
       localStorage.setItem("jalsanjeevani_lang", selectedLang);
+      
+      // Sync all other dropdowns on the page
+      switchers.forEach(s => s.value = selectedLang);
+      
       applyTranslation(selectedLang);
     });
-  }
+  });
 
   applyTranslation(savedLang);
 });

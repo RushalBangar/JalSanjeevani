@@ -3,41 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panchayat App | JalSanjeevani</title>
+  <title>Panchayat Verification PWA | JalSanjeevani</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body class="mobile-layout">
 
+  <!-- Mobile Header -->
   <header class="mobile-header">
-    <h2>Verify Delivery</h2>
-    <span class="user-badge" style="background: #f59e0b;">Gram Panchayat</span>
+    <div class="mobile-brand">
+      <a href="index.html" style="display: flex; align-items: center; gap: 6px;">
+        <img src="assets/logo.jpg" alt="JalSanjeevani">
+        <h2 style="font-size: 0.95rem;">Panchayat Verifier</h2>
+      </a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <select id="langSwitcher" class="lang-select-sm" style="padding: 3px 6px; font-size: 0.75rem;" aria-label="Language Selector">
+        <option value="en">EN</option>
+        <option value="mr">मराठी</option>
+        <option value="hi">हिंदी</option>
+      </select>
+      <span class="user-badge panchayat">Khopadi GP</span>
+    </div>
   </header>
 
+  <!-- Mobile Main Content -->
   <main class="mobile-content">
     
-    <p class="qr-instructions">Scan the tanker driver's encrypted QR code to authorize the delivery payment.</p>
+    <!-- Community Cistern Telemetry -->
+    <div class="manifest-card glass-panel">
+      <h3>
+        <span>Khopadi Community Cistern</span>
+        <span style="font-size: 0.75rem; color: var(--alert-red);">● 8% CRITICAL</span>
+      </h3>
+      <div class="detail-row">
+        <span>Current Reserve</span>
+        <span style="color: var(--alert-red);">2,000 / 25,000 L</span>
+      </div>
+      <div class="detail-row">
+        <span>Incoming Authorized Drop</span>
+        <span style="color: var(--primary-color);">+10,000 L (Tanker #04)</span>
+      </div>
+      <div class="detail-row">
+        <span>Beneficiaries</span>
+        <span>3,200 Humans • 1,200 Livestock</span>
+      </div>
+    </div>
 
-    <div class="scanner-window" id="scanner">
+    <!-- Instructions -->
+    <p class="qr-instructions">
+      Scan the driver's encrypted delivery key inside the 15m geofence perimeter to verify water discharge and authorize payment escrow.
+    </p>
+
+    <!-- Camera Viewfinder -->
+    <div class="scanner-window" id="scannerWindow">
       <div class="scanner-line"></div>
-      <span style="color: var(--text-muted);">Camera active...</span>
+      <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1rem;">
+        <span style="font-size: 2rem; display: block; margin-bottom: 6px;">📷</span>
+        <span>Camera Active • Awaiting Driver QR</span>
+      </div>
     </div>
 
-    <button id="btnSimulateScan" class="btn btn-primary btn-block">Simulate QR Scan</button>
+    <!-- Scan Trigger Button -->
+    <button id="btnSimulateScan" class="btn btn-primary btn-block">
+      Scan Driver's Cryptographic QR
+    </button>
 
+    <!-- Verified Handshake Result Box -->
     <div id="statusBox" class="status-box">
-      <strong>Cryptographic Handshake Verified!</strong>
-      <p style="font-size: 0.8rem; margin-top: 4px;">Tanker #04 • 10,000L • Uploaded</p>
+      <strong>✓ DUAL-KEY CRYPTOGRAPHIC HANDSHAKE VERIFIED</strong>
+      <div style="font-size: 0.8rem; text-align: left; margin-top: 10px; line-height: 1.6; color: var(--text-secondary);">
+        <p><strong>Tanker ID:</strong> TN-04 (MH-15-AG-982)</p>
+        <p><strong>Driver Key:</strong> <span class="font-mono">0x9F3B4ED812C4</span></p>
+        <p><strong>Cistern Geokey:</strong> <span class="font-mono">0x74CE8A1109B2</span></p>
+        <p><strong>Discharge Volume:</strong> 10,000 Liters</p>
+        <p style="color: var(--telemetry-emerald); font-weight: 600; margin-top: 4px;">
+          ✓ New Cistern Reserve: 12,000 Liters (48% Safe)
+        </p>
+        <p style="font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
+          Signed receipt stored offline in IndexedDB • Escrow released to contractor
+        </p>
+      </div>
     </div>
-
-    <br><br>
-    <a href="index.html" class="btn btn-outline btn-block" style="text-align: center;">Logout</a>
 
   </main>
 
+  <!-- Bottom App Switcher -->
+  <footer class="mobile-bottom-nav">
+    <a href="driver.html" class="btn btn-outline btn-sm" style="flex: 1; text-align: center; font-size: 0.78rem;">
+      🚛 Driver View
+    </a>
+    <a href="dashboard.html" class="btn btn-outline btn-sm" style="flex: 1; text-align: center; font-size: 0.78rem;">
+      🛰️ Collector View
+    </a>
+    <a href="index.html" class="btn btn-outline btn-sm" style="text-align: center; font-size: 0.78rem;">
+      Sign Out
+    </a>
+  </footer>
+
+  <script src="js/lang.js"></script>
   <script src="js/panchayat.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

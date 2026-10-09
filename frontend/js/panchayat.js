@@ -1,31 +1,49 @@
 document.addEventListener("DOMContentLoaded", () => {
-  
   const btnScan = document.getElementById("btnSimulateScan");
   const statusBox = document.getElementById("statusBox");
-  const scanner = document.getElementById("scanner");
+  const scannerWindow = document.getElementById("scannerWindow");
 
-  btnScan.addEventListener("click", () => {
-    // Simulate a scan delay
-    btnScan.innerHTML = "Scanning...";
-    btnScan.disabled = true;
-    scanner.style.borderColor = "#22c55e";
+  if (btnScan) {
+    btnScan.addEventListener("click", () => {
+      btnScan.innerHTML = "Verifying Asymmetric Key Pair...";
+      btnScan.disabled = true;
+      btnScan.style.opacity = "0.75";
 
-    setTimeout(() => {
-      // Simulate successful cryptographic verification
-      btnScan.style.display = "none";
-      scanner.style.display = "none";
-      statusBox.classList.add("success");
-      
-      // In production, this saves the signed receipt to IndexedDB
-      // and triggers the service worker background sync
-      if ('serviceWorker' in navigator && 'SyncManager' in window) {
-        navigator.serviceWorker.ready.then((swRegistration) => {
-          // swRegistration.sync.register('sync-deliveries');
-          console.log("Delivery receipt queued for background sync.");
-        });
+      if (scannerWindow) {
+        scannerWindow.style.borderColor = "#10b981";
       }
 
-    }, 1500);
-  });
+      // Simulate cryptographic verification delay
+      setTimeout(() => {
+        // Haptic feedback if on mobile device
+        if ("vibrate" in navigator) {
+          try { navigator.vibrate([100, 50, 100]); } catch(e) {}
+        }
 
+        btnScan.style.display = "none";
+        if (scannerWindow) {
+          scannerWindow.style.display = "none";
+        }
+        if (statusBox) {
+          statusBox.classList.add("success");
+        }
+
+        // Store signed delivery receipt locally
+        const receipt = {
+          village: "Khopadi",
+          tanker: "TN-04",
+          volume: 10000,
+          timestamp: new Date().toISOString(),
+          status: "VERIFIED_DELIVERED"
+        };
+        try {
+          const receipts = JSON.parse(localStorage.getItem("jalsanjeevani_receipts") || "[]");
+          receipts.push(receipt);
+          localStorage.setItem("jalsanjeevani_receipts", JSON.stringify(receipts));
+        } catch(e) {}
+
+        console.log("Cryptographic proof of delivery saved to offline storage:", receipt);
+      }, 1200);
+    });
+  }
 });
