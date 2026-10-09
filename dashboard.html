@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Dashboard | JalSetu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="dash-nav">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 12 2 12 2C12 2 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" fill="#0ea5e9"/>
+      </svg>
+      Jal<span>Setu</span>
+    </div>
+    <div class="nav-status">
+      <span class="status-indicator online"></span> System Live (Sinnar Taluka)
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <div class="dash-container">
+    
+    <!-- Sidebar / Control Panel -->
+    <aside class="sidebar glass-panel">
+      
+      <div class="panel-section">
+        <h3>Taluka Status</h3>
+        <div class="stat-grid">
+          <div class="stat-box warning">
+            <span class="stat-value">12</span>
+            <span class="stat-label">Villages < 24h Water</span>
+          </div>
+          <div class="stat-box danger">
+            <span class="stat-label">Tanker Alerts</span>
+            <span class="stat-value" id="alertCounter">1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section alert-feed">
+        <h3>Live Alerts</h3>
+        <div class="alert-card anomaly">
+          <div class="alert-header">
+            <span class="badge">DIVERSION</span>
+            <span class="time">Just now</span>
+          </div>
+          <p><strong>Tanker #07</strong> deviated 12km off-route towards Hwy-10. GPS handshake missing.</p>
+          <button class="btn btn-outline btn-sm">Suspend Payment</button>
+        </div>
+      </div>
+
+      <div class="panel-section action-panel">
+        <h3>Emergency Allocation</h3>
+        <p class="desc">Deploy OR-Tools routing solver to allocate available tankers to critical villages and cattle camps.</p>
+        <button id="btnAllocate" class="btn btn-primary btn-block">Execute Emergency Dispatch</button>
+      </div>
+
+    </aside>
+
+    <!-- Map Area -->
+    <main class="map-area">
+      <div id="map"></div>
+    </main>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

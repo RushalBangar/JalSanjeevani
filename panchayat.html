@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat App | JalSetu</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body class="mobile-layout">
+
+  <header class="mobile-header">
+    <h2>Verify Delivery</h2>
+    <span class="user-badge" style="background: #f59e0b;">Gram Panchayat</span>
+  </header>
+
+  <main class="mobile-content">
+    
+    <p class="qr-instructions">Scan the tanker driver's encrypted QR code to authorize the delivery payment.</p>
+
+    <div class="scanner-window" id="scanner">
+      <div class="scanner-line"></div>
+      <span style="color: var(--text-muted);">Camera active...</span>
+    </div>
+
+    <button id="btnSimulateScan" class="btn btn-primary btn-block">Simulate QR Scan</button>
+
+    <div id="statusBox" class="status-box">
+      <strong>Cryptographic Handshake Verified!</strong>
+      <p style="font-size: 0.8rem; margin-top: 4px;">Tanker #04 • 10,000L • Uploaded</p>
+    </div>
+
+    <br><br>
+    <a href="index.html" class="btn btn-outline btn-block" style="text-align: center;">Logout</a>
+
+  </main>
+
+  <script src="js/panchayat.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>

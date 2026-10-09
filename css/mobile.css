@@ -1,0 +1,135 @@
+/* Mobile PWA Specific Styles */
+.mobile-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 500px; /* Constrain for mobile feel on desktop browsers */
+  margin: 0 auto;
+  background: var(--bg-dark);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.mobile-header {
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-header h2 {
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.user-badge {
+  font-size: 0.75rem;
+  background: var(--primary-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.mobile-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+/* Manifest Cards */
+.manifest-card {
+  margin-bottom: 1.5rem;
+}
+
+.manifest-card h3 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.9rem;
+}
+
+.detail-row span:last-child {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* QR Code Container */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.qr-container img {
+  max-width: 200px;
+}
+
+.qr-instructions {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Scanner Mock */
+.scanner-window {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px dashed var(--primary-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  background: rgba(0,0,0,0.2);
+}
+
+.scanner-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: scan 2s infinite linear;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  50% { top: 100%; }
+  100% { top: 0; }
+}
+
+.status-box {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+  display: none;
+}
+
+.status-box.success {
+  display: block;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid #22c55e;
+  color: #22c55e;
+}

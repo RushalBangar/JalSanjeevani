@@ -1,0 +1,16 @@
+{
+  "name": "JalSetu Field PWA",
+  "short_name": "JalSetu",
+  "description": "Offline-first water tanker delivery verification system.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Water_Drop.svg/1024px-Water_Drop.svg.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
