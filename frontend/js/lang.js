@@ -48,18 +48,18 @@ const translations = {
 
 document.addEventListener("DOMContentLoaded", () => {
   const langSwitcher = document.getElementById("langSwitcher");
-  
-  // Check local storage for saved language
   const savedLang = localStorage.getItem("jalsanjeevani_lang") || "en";
-  langSwitcher.value = savedLang;
-  applyTranslation(savedLang);
 
-  // Handle language change
-  langSwitcher.addEventListener("change", (e) => {
-    const selectedLang = e.target.value;
-    localStorage.setItem("jalsanjeevani_lang", selectedLang);
-    applyTranslation(selectedLang);
-  });
+  if (langSwitcher) {
+    langSwitcher.value = savedLang;
+    langSwitcher.addEventListener("change", (e) => {
+      const selectedLang = e.target.value;
+      localStorage.setItem("jalsanjeevani_lang", selectedLang);
+      applyTranslation(selectedLang);
+    });
+  }
+
+  applyTranslation(savedLang);
 });
 
 function applyTranslation(lang) {
