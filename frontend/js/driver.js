@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. Render High-Density QR Code
   const qrContainer = document.getElementById("qrcode");
   if (qrContainer && typeof QRCode !== "undefined") {
+    qrContainer.innerHTML = "";
     new QRCode(qrContainer, {
       text: payload,
       width: 180,
@@ -30,31 +31,57 @@ document.addEventListener("DOMContentLoaded", () => {
   const geofenceStatusText = document.getElementById("geofenceStatusText");
   const driverCryptoKey = document.getElementById("driverCryptoKey");
 
+  let isArrived = false;
+
   if (btnArrived) {
     btnArrived.addEventListener("click", () => {
-      btnArrived.innerHTML = "Acquiring GPS Lock...";
-      btnArrived.disabled = true;
+      if (!isArrived) {
+        btnArrived.innerHTML = "Acquiring GPS Lock...";
+        btnArrived.disabled = true;
 
-      setTimeout(() => {
+        setTimeout(() => {
+          isArrived = true;
+          if (geofenceDot) {
+            geofenceDot.style.background = "#10b981";
+            geofenceDot.style.boxShadow = "0 0 10px #10b981";
+          }
+          if (geofenceStatusText) {
+            geofenceStatusText.innerHTML = "✓ Inside Cistern Perimeter (12m)";
+            geofenceStatusText.style.color = "#10b981";
+            geofenceStatusText.style.fontWeight = "600";
+          }
+          if (driverCryptoKey) {
+            driverCryptoKey.innerHTML = "TOKEN READY: 0x9F3B4E • GEOFENCE VERIFIED";
+            driverCryptoKey.style.background = "#dcfce7";
+            driverCryptoKey.style.color = "#15803d";
+          }
+
+          btnArrived.disabled = false;
+          btnArrived.innerHTML = "Arrival Verified ✓ (Reset)";
+          btnArrived.style.background = "linear-gradient(135deg, #10b981, #059669)";
+          btnArrived.style.color = "#fff";
+        }, 800);
+      } else {
+        // Reset state for easy demo retesting
+        isArrived = false;
         if (geofenceDot) {
-          geofenceDot.style.background = "#10b981";
-          geofenceDot.style.boxShadow = "0 0 10px #10b981";
+          geofenceDot.style.background = "var(--accent-amber)";
+          geofenceDot.style.boxShadow = "none";
         }
         if (geofenceStatusText) {
-          geofenceStatusText.innerHTML = "✓ Inside Cistern Perimeter (12m)";
-          geofenceStatusText.style.color = "#10b981";
-          geofenceStatusText.style.fontWeight = "600";
+          geofenceStatusText.innerHTML = "Geofence: 180m from Target";
+          geofenceStatusText.style.color = "inherit";
+          geofenceStatusText.style.fontWeight = "normal";
         }
         if (driverCryptoKey) {
-          driverCryptoKey.innerHTML = "TOKEN READY: 0x9F3B4E • GEOFENCE VERIFIED";
-          driverCryptoKey.style.background = "#dcfce7";
-          driverCryptoKey.style.color = "#15803d";
+          driverCryptoKey.innerHTML = "KEY: 0x9F3B4E • GEOFENCE ENCRYPTED";
+          driverCryptoKey.style.background = "#e2e8f0";
+          driverCryptoKey.style.color = "#070e1a";
         }
-
-        btnArrived.innerHTML = "Arrival Verified ✓";
-        btnArrived.style.background = "linear-gradient(135deg, #10b981, #059669)";
-        btnArrived.style.color = "#fff";
-      }, 900);
+        btnArrived.innerHTML = "Log Arrival Coordinates";
+        btnArrived.style.background = "";
+        btnArrived.style.color = "";
+      }
     });
   }
 });

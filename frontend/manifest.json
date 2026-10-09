@@ -1,16 +1,21 @@
 {
   "name": "JalSanjeevani Field PWA",
   "short_name": "JalSanjeevani",
-  "description": "Offline-first water tanker delivery verification system.",
-  "start_url": "/index.html",
+  "description": "Offline-first sovereign drought water logistics and verification system.",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0ea5e9",
+  "background_color": "#070e1a",
+  "theme_color": "#00e5ff",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Water_Drop.svg/1024px-Water_Drop.svg.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "./assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "./assets/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
     }
   ]
 }

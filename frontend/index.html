@@ -8,17 +8,21 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <style>
     @layer base { 
+      html { scroll-behavior: smooth; }
       html, body { margin: 0; padding: 0; } 
       body { overscroll-behavior: none; } 
       main > :first-child { margin-top: 0 !important; } 
       main > :last-child { margin-bottom: 0 !important; } 
     } 
-    ::-webkit-scrollbar { display: none; }
+    /* High-tech telemetry scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070e1a; }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00e5ff; }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script id="tailwind-config">
@@ -26,18 +30,18 @@
   </script>
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
-  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-slate/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-slate/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)] border-b border-surface-container-high/40">
     <div class="h-20 w-full px-gutter max-w-7xl mx-auto flex items-center justify-between gap-space-md">
       <div class="flex items-center gap-space-md">
-        <a class="flex items-center gap-3 group" data-path="landing" href="#">
-          <img alt="JalSanjeevani Logo" class="h-10 w-auto object-contain rounded-md" src="assets/logo.jpg"/>
+        <a class="flex items-center gap-3 group" data-path="landing" href="#hero">
+          <img alt="JalSanjeevani Logo" class="h-10 w-auto object-contain rounded-md shadow-sm group-hover:scale-105 transition-transform" src="assets/logo.jpg"/>
           <div class="flex flex-col">
             <span class="font-headline-sm text-headline-sm text-text-primary tracking-tight leading-none group-hover:text-primary transition-colors">JalSanjeevani</span>
             <span class="font-label-caps text-label-caps text-text-muted uppercase leading-tight">Sanjeevani Grid</span>
           </div>
         </a>
         <div class="hidden xl:flex items-center gap-2 pl-space-md py-1">
-          <div class="flex items-center gap-2 px-space-sm py-1 rounded-full bg-surface-container-low">
+          <div class="flex items-center gap-2 px-space-sm py-1 rounded-full bg-surface-container-low border border-surface-glass-border">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-telemetry-emerald opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-telemetry-emerald shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
@@ -56,18 +60,18 @@
       </nav>
       <div class="flex items-center gap-space-sm">
         <div class="relative hidden sm:block">
-          <select aria-label="Language Selector" id="langSwitcher" class="lang-switcher appearance-none bg-surface-container-low text-on-surface font-label-ui text-label-ui rounded-lg pl-3 pr-8 py-2 focus:outline-none transition-colors">
+          <select aria-label="Language Selector" id="langSwitcher" class="lang-switcher appearance-none bg-surface-container-low text-on-surface font-label-ui text-label-ui rounded-lg pl-3 pr-8 py-2 border border-surface-glass-border hover:border-surface-glass-border-bright focus:outline-none focus:ring-1 focus:ring-primary-container transition-colors cursor-pointer">
             <option value="en">English</option>
             <option value="mr">मराठी</option>
             <option value="hi">हिंदी</option>
           </select>
           <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">expand_more</span>
         </div>
-        <a class="hidden sm:inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-text-primary transition-all" data-i18n="nav_login" href="login.html">Portal Login</a>
+        <a class="hidden sm:inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-text-primary transition-all border border-surface-glass-border" data-i18n="nav_login" href="login.html">Portal Login</a>
         <a class="inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-primary-container text-on-primary-container hover:bg-tertiary-container hover:text-on-tertiary-container shadow-[0_0_16px_rgba(0,229,255,0.25)] transition-all" data-i18n="nav_dashboard" href="dashboard.html">Access Dashboard</a>
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-1">
-          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-        </div>
+        <a href="login.html" title="Access Role Portal" class="w-8 h-8 rounded-full bg-primary/20 hover:bg-primary/30 border border-primary/40 flex items-center justify-center ml-1 transition-all group">
+          <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform text-[18px]">person</span>
+        </a>
         <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" class="lg:hidden flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high focus:outline-none" type="button">
           <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
@@ -551,9 +555,10 @@
               <a class="px-6 py-3.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-semibold shadow-md hover:bg-tertiary-container hover:text-on-tertiary-container transition-all" href="login.html">
                 Access Command Terminal
               </a>
-              <a class="px-6 py-3.5 rounded-lg bg-surface-container-high text-on-surface hover:text-text-primary font-headline-sm text-headline-sm font-semibold transition-all" href="#impact-section">
-                View Audit Log
-              </a>
+              <button id="btnOpenAuditModal" class="px-6 py-3.5 rounded-lg bg-surface-container-high border border-surface-glass-border text-on-surface hover:text-text-primary hover:border-surface-glass-border-bright font-headline-sm text-headline-sm font-semibold transition-all inline-flex items-center gap-2 cursor-pointer">
+                <span class="material-symbols-outlined text-[18px] text-primary">verified</span>
+                <span>View Audit Log</span>
+              </button>
             </div>
           </div>
         </section>
@@ -630,6 +635,109 @@
       </div>
     </div>
   </footer>
+
+  <!-- Cryptographic Audit Ledger Modal -->
+  <div id="auditModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all opacity-0">
+    <div class="relative w-full max-w-3xl rounded-2xl bg-surface-container-low border border-surface-glass-border-bright shadow-2xl p-6 sm:p-8 flex flex-col gap-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between border-b border-surface-container pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-primary-container/10 border border-primary-container/30 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[28px]">verified_user</span>
+          </div>
+          <div>
+            <h3 class="font-headline-md text-headline-md text-text-primary font-bold">Cryptographic Sovereign Ledger</h3>
+            <p class="font-body-sm text-body-sm text-text-secondary">Sinnar Taluka, Nashik District • Real-Time Proof-of-Delivery Handshakes</p>
+          </div>
+        </div>
+        <button id="btnCloseAuditModal" class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-container-high transition-colors" aria-label="Close modal">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-xl bg-surface-container flex flex-col gap-1 border border-surface-container-high">
+          <span class="font-label-caps text-label-caps text-text-muted">TOTAL ALLOCATED</span>
+          <span class="font-telemetry-metric-lg text-telemetry-metric-lg text-primary">20,000 L</span>
+          <span class="text-[11px] text-telemetry-emerald font-mono">100% Guaranteed</span>
+        </div>
+        <div class="p-3.5 rounded-xl bg-surface-container flex flex-col gap-1 border border-surface-container-high">
+          <span class="font-label-caps text-label-caps text-text-muted">VERIFIED HANDSHAKES</span>
+          <span class="font-telemetry-metric-lg text-telemetry-metric-lg text-telemetry-emerald">2 of 2</span>
+          <span class="text-[11px] text-telemetry-emerald font-mono">Dual-Key Confirmed</span>
+        </div>
+        <div class="p-3.5 rounded-xl bg-surface-container flex flex-col gap-1 border border-surface-container-high">
+          <span class="font-label-caps text-label-caps text-text-muted">ESCROW INTERCEPTION</span>
+          <span class="font-telemetry-metric-lg text-telemetry-metric-lg text-alert-critical-red">1 ANOMALY</span>
+          <span class="text-[11px] text-alert-critical-red font-mono">₹1,45,000 Frozen</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <span class="font-label-caps text-label-caps text-text-muted uppercase tracking-wider">Live Blockchain / Offline Ledger Transactions</span>
+        
+        <div class="space-y-3">
+          <!-- Record 1 -->
+          <div class="p-4 rounded-xl bg-surface-container border border-surface-container-high flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-bold text-text-primary">Tanker #04 (MH-15-AG-982)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-telemetry-emerald/20 text-telemetry-emerald font-bold">VERIFIED</span>
+              </div>
+              <span class="text-xs text-text-secondary">Destination: Khopadi Gram Panchayat Cistern (10,000L Delivered)</span>
+              <span class="font-mono text-[11px] text-text-muted">Key: 0x9F3B4ED812C4 • Geofence: 12m from Cistern • Hash: SHA256:8f4c2e1b</span>
+            </div>
+            <div class="text-left sm:text-right">
+              <span class="inline-block text-xs font-semibold text-telemetry-emerald">Escrow Released ✓</span>
+              <span class="block text-[11px] text-text-muted font-mono">14m ago</span>
+            </div>
+          </div>
+
+          <!-- Record 2 -->
+          <div class="p-4 rounded-xl bg-surface-container border border-surface-container-high flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-bold text-text-primary">Tanker #12 (MH-15-AG-402)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-primary-container/20 text-primary font-bold">IN TRANSIT</span>
+              </div>
+              <span class="text-xs text-text-secondary">Destination: Pangari Public Cistern (10,000L)</span>
+              <span class="font-mono text-[11px] text-text-muted">Key: 0x32A78CB990E1 • Route Corridor: Sinnar Highway Sector B</span>
+            </div>
+            <div class="text-left sm:text-right">
+              <span class="inline-block text-xs font-semibold text-primary">GPS Geofence Synced</span>
+              <span class="block text-[11px] text-text-muted font-mono">ETA 18m</span>
+            </div>
+          </div>
+
+          <!-- Record 3 (Rogue) -->
+          <div class="p-4 rounded-xl bg-alert-critical-red/10 border border-alert-critical-red/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-bold text-alert-critical-red">Tanker #07 (MH-15-TK-889)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-alert-critical-red/20 text-alert-critical-red font-bold">DIVERSION ANOMALY</span>
+              </div>
+              <span class="text-xs text-text-secondary">Detected off-corridor near private quarry (12km deviation)</span>
+              <span class="font-mono text-[11px] text-alert-critical-red/80">Missing Cistern Handshake • Rogue Geofence Violation</span>
+            </div>
+            <div class="text-left sm:text-right">
+              <span class="inline-block text-xs font-bold text-alert-critical-red">ESCROW FROZEN ✕</span>
+              <span class="block text-[11px] text-text-muted font-mono">RTO Alert Dispatched</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-surface-container">
+        <button id="btnExportLedgerJson" class="px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-bright text-text-primary text-xs font-mono font-semibold transition-all inline-flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px]">download</span>
+          Export Signed Ledger (.JSON)
+        </button>
+        <button id="btnCloseAuditModalBtn" class="px-5 py-2 rounded-lg bg-primary-container text-on-primary-container text-xs font-semibold hover:bg-tertiary-container transition-all">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/lang.js"></script>
   <script>
     // Mobile menu toggle
@@ -645,6 +753,62 @@
         });
       });
     }
+
+    // Cryptographic Audit Modal Handlers
+    const auditModal = document.getElementById('auditModal');
+    const btnOpenAuditModal = document.getElementById('btnOpenAuditModal');
+    const btnCloseAuditModal = document.getElementById('btnCloseAuditModal');
+    const btnCloseAuditModalBtn = document.getElementById('btnCloseAuditModalBtn');
+    const btnExportLedgerJson = document.getElementById('btnExportLedgerJson');
+
+    function openAudit() {
+      if (!auditModal) return;
+      auditModal.classList.remove('hidden');
+      auditModal.classList.add('flex');
+      setTimeout(() => {
+        auditModal.classList.remove('opacity-0');
+      }, 10);
+    }
+
+    function closeAudit() {
+      if (!auditModal) return;
+      auditModal.classList.add('opacity-0');
+      setTimeout(() => {
+        auditModal.classList.remove('flex');
+        auditModal.classList.add('hidden');
+      }, 200);
+    }
+
+    btnOpenAuditModal?.addEventListener('click', openAudit);
+    btnCloseAuditModal?.addEventListener('click', closeAudit);
+    btnCloseAuditModalBtn?.addEventListener('click', closeAudit);
+
+    auditModal?.addEventListener('click', (e) => {
+      if (e.target === auditModal) closeAudit();
+    });
+
+    // Export Signed Ledger JSON
+    btnExportLedgerJson?.addEventListener('click', () => {
+      const auditData = {
+        taluka: "Sinnar",
+        district: "Nashik",
+        timestamp: new Date().toISOString(),
+        telemetry_source: "Copernicus Sentinel-2 & NASA SMAP",
+        records: [
+          { tanker: "TN-04", reg: "MH-15-AG-982", village: "Khopadi", liters: 10000, key: "0x9F3B4ED812C4", status: "VERIFIED" },
+          { tanker: "TN-12", reg: "MH-15-AG-402", village: "Pangari", liters: 10000, key: "0x32A78CB990E1", status: "IN_TRANSIT" },
+          { tanker: "TN-07", reg: "MH-15-TK-889", status: "ANOMALY_ESCROW_FROZEN", deviation_km: 12 }
+        ],
+        signature: "SHA256:d8c47f9a12b6e45c89a01f4e"
+      };
+      const blob = new Blob([JSON.stringify(auditData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "jalsanjeevani_sinnar_audit.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
   </script>
 </body>
 </html>

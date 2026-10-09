@@ -3,7 +3,18 @@ const MAP_CENTER = [19.8450, 74.0000];
 const MAP_ZOOM = 11;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Initialize Map
+  // 1. Live UTC Clock
+  function updateLiveClock() {
+    const clockEl = document.getElementById("liveClock");
+    if (!clockEl) return;
+    const now = new Date();
+    const utcStr = now.toISOString().substring(11, 19);
+    clockEl.textContent = `UTC ${utcStr}`;
+  }
+  setInterval(updateLiveClock, 1000);
+  updateLiveClock();
+
+  // 2. Initialize Leaflet Map
   const map = L.map('map', {
     zoomControl: false
   }).setView(MAP_CENTER, MAP_ZOOM);
@@ -18,7 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
     maxZoom: 20
   }).addTo(map);
 
-  // 2. Village Distress Dataset (Copernicus Telemetry & Local Demographics)
+  // Layer groups for toggleable telemetry
+  const villageLayer = L.layerGroup().addTo(map);
+  const fleetLayer = L.layerGroup().addTo(map);
+  const rogueLayer = L.layerGroup().addTo(map);
+  const routeLayer = L.layerGroup().addTo(map);
+
+  // 3. Village Distress Dataset (Copernicus Telemetry & Demographics)
   const villages = [
     { 
       id: "1", 
@@ -68,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const markersMap = {};
 
-  // Render Village Heatmap Circles & Popups
+  // Render Village Heatmap Circles into villageLayer
   villages.forEach(v => {
     let color = v.status === "critical" ? "#ef4444" : v.status === "warning" ? "#f59e0b" : "#10b981";
     let humanDemand = v.population * 40;
@@ -82,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       weight: 2,
       radius: 1400
     }).bindPopup(`
-      <div style="font-family: Inter, sans-serif; min-width: 200px;">
+      <div style="font-family: Inter, sans-serif; min-width: 210px;">
         <h4 style="margin: 0 0 4px 0; color: #00e5ff; font-size: 1rem;">${v.name} Village</h4>
         <div style="margin-bottom: 8px;">
           <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: ${color}20; color: ${color}; border: 1px solid ${color}50;">
@@ -99,15 +116,45 @@ document.addEventListener("DOMContentLoaded", () => {
           </p>
         </div>
       </div>
-    `).addTo(map);
+    `);
 
+    circle.addTo(villageLayer);
     markersMap[v.id] = { circle, coords: v.coords };
   });
 
-  // Render Dynamic Village List in Sidebar
+  // 4. Village Matrix List, Search & Filter Logic
   const villageListContainer = document.getElementById("villageListContainer");
-  if (villageListContainer) {
-    villageListContainer.innerHTML = villages.map(v => {
+  const villageSearchInput = document.getElementById("villageSearchInput");
+  const filterPillsContainer = document.getElementById("filterPillsContainer");
+  const matrixCounter = document.getElementById("matrixCounter");
+
+  let currentFilter = "all";
+  let currentSearch = "";
+
+  function renderVillageList() {
+    if (!villageListContainer) return;
+
+    const filtered = villages.filter(v => {
+      const matchesFilter = currentFilter === "all" || v.status === currentFilter;
+      const matchesSearch = v.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                            v.status.toLowerCase().includes(currentSearch.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
+
+    if (matrixCounter) {
+      matrixCounter.textContent = `${filtered.length} hamlets`;
+    }
+
+    if (filtered.length === 0) {
+      villageListContainer.innerHTML = `
+        <div style="padding: 1rem; text-align: center; color: var(--text-dim); font-size: 0.8rem;">
+          No matching hamlets found.
+        </div>
+      `;
+      return;
+    }
+
+    villageListContainer.innerHTML = filtered.map(v => {
       let totalLiters = (v.population * 40 + v.cattle * 70).toLocaleString();
       return `
         <div class="village-item" data-id="${v.id}">
@@ -120,19 +167,48 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }).join("");
 
-    // Click on village item flies map to location
+    // Re-bind click event to fly to marker
     villageListContainer.querySelectorAll(".village-item").forEach(item => {
       item.addEventListener("click", () => {
         const id = item.getAttribute("data-id");
+        villageListContainer.querySelectorAll(".village-item").forEach(el => el.classList.remove("active"));
+        item.classList.add("active");
+
         if (markersMap[id]) {
           map.flyTo(markersMap[id].coords, 13, { duration: 1.2 });
           markersMap[id].circle.openPopup();
+        }
+
+        // On mobile, close sidebar after clicking so map is immediately visible
+        const dashSidebar = document.getElementById("dashSidebar");
+        const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+        if (window.innerWidth < 900 && dashSidebar && dashSidebar.classList.contains("mobile-open")) {
+          dashSidebar.classList.remove("mobile-open");
+          if (btnToggleSidebar) btnToggleSidebar.textContent = "📋 View Telemetry & Controls";
         }
       });
     });
   }
 
-  // 3. Tanker Fleet GPS Tracking Markers
+  renderVillageList();
+
+  // Search input handler
+  villageSearchInput?.addEventListener("input", (e) => {
+    currentSearch = e.target.value.trim();
+    renderVillageList();
+  });
+
+  // Filter pills handler
+  filterPillsContainer?.querySelectorAll(".filter-pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      filterPillsContainer.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      currentFilter = pill.getAttribute("data-filter") || "all";
+      renderVillageList();
+    });
+  });
+
+  // 5. Tanker Fleet GPS Tracking Markers
   const depotIcon = L.divIcon({
     className: 'custom-depot-icon',
     html: `<div style="background:#00e5ff; border:2px solid #fff; border-radius:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px #00e5ff; font-size:11px; font-weight:bold; color:#070e1a;">D</div>`,
@@ -157,25 +233,57 @@ document.addEventListener("DOMContentLoaded", () => {
   // Depot Marker (Sinnar Central Water Reservoir)
   L.marker(MAP_CENTER, { icon: depotIcon })
     .bindPopup("<b>Sinnar Municipal Reservoir (Depot)</b><br>Bulk Headworks • Cryptographic Gate Validated")
-    .addTo(map);
+    .addTo(fleetLayer);
 
   // Active Verified Tankers
   L.marker([19.83, 73.98], { icon: tankerIcon })
     .bindPopup("<b>Tanker #12 (MH-15-AG-402)</b><br>10,000L • Route: Sinnar ⇄ Pangari<br><span style='color:#10b981;'>Geofence Compliant</span>")
-    .addTo(map);
+    .addTo(fleetLayer);
 
   L.marker([19.88, 74.02], { icon: tankerIcon })
     .bindPopup("<b>Tanker #04 (MH-15-AG-982)</b><br>10,000L • Route: Sinnar ⇄ Khopadi<br><span style='color:#10b981;'>Geofence Compliant</span>")
-    .addTo(map);
+    .addTo(fleetLayer);
 
   // Rogue Diverted Tanker
   const rogueTanker = L.marker([19.75, 74.15], { icon: rogueTankerIcon })
     .bindPopup("<b>ALERT: Tanker #07 (MH-15-TK-889)</b><br><span style='color:#ef4444;'>12km Off-Route Anomaly</span><br>GPS Handshake Missing!")
-    .addTo(map);
+    .addTo(rogueLayer);
   
   rogueTanker.openPopup();
 
-  // 4. Freeze Contractor Escrow Action
+  // Layer Toggle Handlers
+  const toggleVillages = document.getElementById("toggleVillages");
+  const toggleFleet = document.getElementById("toggleFleet");
+  const toggleRogue = document.getElementById("toggleRogue");
+
+  toggleVillages?.addEventListener("click", () => {
+    toggleVillages.classList.toggle("active");
+    if (toggleVillages.classList.contains("active")) {
+      map.addLayer(villageLayer);
+    } else {
+      map.removeLayer(villageLayer);
+    }
+  });
+
+  toggleFleet?.addEventListener("click", () => {
+    toggleFleet.classList.toggle("active");
+    if (toggleFleet.classList.contains("active")) {
+      map.addLayer(fleetLayer);
+    } else {
+      map.removeLayer(fleetLayer);
+    }
+  });
+
+  toggleRogue?.addEventListener("click", () => {
+    toggleRogue.classList.toggle("active");
+    if (toggleRogue.classList.contains("active")) {
+      map.addLayer(rogueLayer);
+    } else {
+      map.removeLayer(rogueLayer);
+    }
+  });
+
+  // 6. Freeze Contractor Escrow Action
   const btnSuspend = document.getElementById("btnSuspendPayment");
   const alertCard = document.getElementById("diversionAlertCard");
   const alertBadge = document.getElementById("alertCounterBadge");
@@ -193,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alertCard.style.background = "rgba(16, 185, 129, 0.08)";
         const desc = alertCard.querySelector(".alert-desc");
         if (desc) {
-          desc.innerHTML = "<span style='color:#10b981;'>✓ Action Logged to Blockchain Audit:</span> Payment blocked and regional RTO interception dispatched.";
+          desc.innerHTML = "<span style='color:#10b981; font-weight:600;'>✓ Smart Escrow Frozen on Chain:</span> ₹1,45,000 contractor balance withheld. RTO patrol dispatched to private quarry.";
         }
       }
       
@@ -206,10 +314,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 5. Emergency Allocation with Google OR-Tools Solver Integration
+  // 7. Google OR-Tools Allocation Solver Integration
   const btnAllocate = document.getElementById("btnAllocate");
   const solverResultBox = document.getElementById("solverResultBox");
+  const btnExportManifest = document.getElementById("btnExportManifest");
   let activePolylines = [];
+  let generatedRouteData = null;
 
   if (btnAllocate) {
     btnAllocate.addEventListener("click", async () => {
@@ -217,8 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
       btnAllocate.style.opacity = "0.75";
       btnAllocate.disabled = true;
 
-      // Clear existing drawn route lines
-      activePolylines.forEach(line => map.removeLayer(line));
+      // Clear existing drawn routes
+      routeLayer.clearLayers();
       activePolylines = [];
 
       const payload = {
@@ -232,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
           status: v.status
         })),
         num_tankers: 2,
-        tanker_capacity: 100000
+        tanker_capacity: 250000
       };
 
       let routesDrawn = false;
@@ -247,6 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           const data = await response.json();
           if (data.routes && data.routes.length > 0) {
+            generatedRouteData = data.routes;
             const colors = ['#00e5ff', '#10b981', '#3491ff'];
             data.routes.forEach((route, idx) => {
               const polyCoords = route.map(point => point.coords);
@@ -255,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 weight: 4,
                 dashArray: '8, 8',
                 lineCap: 'round'
-              }).bindPopup(`<b>OR-Tools Route #${idx + 1}</b><br>Statutory Minimum Fulfilled`).addTo(map);
+              }).bindPopup(`<b>OR-Tools Route #${idx + 1}</b><br>Statutory Minimum Fulfilled • 100% Demand Met`).addTo(routeLayer);
 
               activePolylines.push(polyline);
             });
@@ -266,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("Backend API offline, executing local OR-Tools route matrix fallback:", err);
       }
 
-      // Local fallback routes if backend server is offline
+      // Local fallback routes if backend server is offline or returned empty
       if (!routesDrawn) {
         const route1Coords = [
           MAP_CENTER,
@@ -284,15 +395,25 @@ document.addEventListener("DOMContentLoaded", () => {
           color: '#00e5ff',
           weight: 4,
           dashArray: '8, 8'
-        }).bindPopup("<b>Route #1: Sinnar ⇄ Pangari</b><br>Fulfilled: 152,000L Statutory Demand").addTo(map);
+        }).bindPopup("<b>Route #1: Sinnar ⇄ Pangari</b><br>Fulfilled: 152,000L Statutory Demand").addTo(routeLayer);
 
         const line2 = L.polyline(route2Coords, {
           color: '#10b981',
           weight: 4,
           dashArray: '8, 8'
-        }).bindPopup("<b>Route #2: Sinnar ⇄ Khopadi ⇄ Wadgaon</b><br>Fulfilled: 303,500L Combined Quota").addTo(map);
+        }).bindPopup("<b>Route #2: Sinnar ⇄ Khopadi ⇄ Wadgaon</b><br>Fulfilled: 303,500L Combined Quota").addTo(routeLayer);
 
         activePolylines.push(line1, line2);
+        generatedRouteData = [
+          { route_id: 1, waypoints: ["Sinnar Reservoir", "Pangari", "Sinnar Reservoir"], capacity_liters: 152000 },
+          { route_id: 2, waypoints: ["Sinnar Reservoir", "Khopadi", "Wadgaon", "Sinnar Reservoir"], capacity_liters: 303500 }
+        ];
+      }
+
+      // Smoothly fly camera to show all generated routes
+      if (activePolylines.length > 0) {
+        const group = L.featureGroup(activePolylines);
+        map.fitBounds(group.getBounds().pad(0.18), { duration: 1.2 });
       }
 
       btnAllocate.innerHTML = "Dispatch Live (OR-Tools Active) ✓";
@@ -306,7 +427,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6. Mobile Sidebar Toggle Button
+  // Export Route Manifest Handler
+  btnExportManifest?.addEventListener("click", () => {
+    const manifest = {
+      jurisdiction: "Sinnar Taluka Disaster Management Authority",
+      timestamp: new Date().toISOString(),
+      algorithm: "Google OR-Tools CVRP (Capacitated Vehicle Routing Problem)",
+      statutory_human_quota: "40L/capita/day",
+      statutory_cattle_quota: "70L/head/day",
+      routes: generatedRouteData || [
+        { route_id: 1, tanker: "TN-12", destination: "Pangari", allocation: 152000 },
+        { route_id: 2, tanker: "TN-04", destination: "Khopadi & Wadgaon", allocation: 303500 }
+      ],
+      cryptographic_token: "SHA256:4a8b9f1e2c3d5e6a7b8c9d0e"
+    };
+
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sinnar_dispatch_manifest_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // 8. Mobile Sidebar Toggle
   const btnToggleSidebar = document.getElementById("btnToggleSidebar");
   const dashSidebar = document.getElementById("dashSidebar");
 

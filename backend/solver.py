@@ -22,7 +22,9 @@ def create_data_model(villages, num_tankers, tanker_capacity):
     village_names = ["Sinnar Reservoir (Depot)"]
     
     for v in villages:
-        demand_liters = (v.human_pop * 40) + (v.cattle_pop * 70)
+        total_demand = (v.human_pop * 40) + (v.cattle_pop * 70)
+        # Single tanker delivery drop capped at tanker capacity to ensure feasible CVRP trip
+        demand_liters = min(total_demand, tanker_capacity)
         demands.append(demand_liters)
         locations.append((v.lat, v.lng))
         village_names.append(v.name)

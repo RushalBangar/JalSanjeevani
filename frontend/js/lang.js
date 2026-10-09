@@ -18,7 +18,14 @@ const translations = {
     pillar2_title: "Anti-Diversion & Proof-of-Delivery",
     pillar2_desc: "Eliminate the Tanker Mafia. A dual-key offline-first cryptographic QR handshake at geofenced community cisterns ensures water is delivered to the people, not sold to private commercial entities.",
     pillar3_title: "Multi-Objective Logistics Solver",
-    pillar3_desc: "Mathematical fair-share distribution routing using Google OR-Tools. Guarantees a minimum statutory quota of 40L/day for humans and 70L/day for cattle, minimizing diesel burn and eliminating skipped hamlets."
+    pillar3_desc: "Mathematical fair-share distribution routing using Google OR-Tools. Guarantees a minimum statutory quota of 40L/day for humans and 70L/day for cattle, minimizing diesel burn and eliminating skipped hamlets.",
+    stat_depleted: "Villages Depleted",
+    stat_warning: "Warning Zone",
+    stat_human: "Human Minimum",
+    stat_cattle: "Cattle Quota",
+    btn_dispatch: "Execute Emergency Dispatch",
+    btn_freeze: "Freeze Contractor Escrow",
+    audit_title: "Cryptographic Sovereign Ledger"
   },
   mr: {
     hero_badge: "एआय (AI) द्वारे पाणीटंचाईचा अंदाज",
@@ -39,7 +46,14 @@ const translations = {
     pillar2_title: "चोरीविरोधी प्रणाली (QR पडताळणी)",
     pillar2_desc: "गावातील पाण्याच्या टाकीजवळ क्यूआर कोड स्कॅन केल्याशिवाय कंत्राटदाराला पैसे मिळत नाहीत. यामुळे टँकर मधील पाण्याची खासगी कारखान्यांना होणारी बेकायदेशीर विक्री थांबते.",
     pillar3_title: "पाणीवाटप नियोजन (लॉजिस्टिक सॉल्व्हर)",
-    pillar3_desc: "प्रत्येक माणसासाठी ४० लिटर आणि जनावरासाठी ७० लिटर पाण्याचे वाटप करण्याचे गणितीय नियोजन. एकाही वाडीला किंवा जनावरांच्या पाणवठ्याला पाण्यापासून वंचित ठेवले जात नाही."
+    pillar3_desc: "प्रत्येक माणसासाठी ४० लिटर आणि जनावरासाठी ७० लिटर पाण्याचे वाटप करण्याचे गणितीय नियोजन. एकाही वाडीला किंवा जनावरांच्या पाणवठ्याला पाण्यापासून वंचित ठेवले जात नाही.",
+    stat_depleted: "पाणी संपलेली गावे",
+    stat_warning: "इशारा क्षेत्र",
+    stat_human: "मानवी किमान कोटा",
+    stat_cattle: "पशुधन कोटा",
+    btn_dispatch: "आपत्कालीन पाणीवाटप सुरू करा",
+    btn_freeze: "कंत्राटदाराची रक्कम रोखा",
+    audit_title: "अधिकृत क्रिप्टोग्राफिक खतावणी (लेजर)"
   },
   hi: {
     hero_badge: "एआई (AI) द्वारा जल संकट की भविष्यवाणी",
@@ -60,7 +74,14 @@ const translations = {
     pillar2_title: "टैंकर चोरी की रोकथाम (QR सत्यापन)",
     pillar2_desc: "टैंकर माफिया का खात्मा। गाँव की टंकी पर QR स्कैन किए बिना पानी की डिलीवरी नहीं मानी जाएगी, जिससे पानी की व्यावसायिक बिक्री पर रोक लगती है।",
     pillar3_title: "न्यायसंगत वितरण प्रणाली",
-    pillar3_desc: "Google OR-Tools का उपयोग करके पानी के टैंकरों का रूट तय किया जाता है। यह हर इंसान के लिए 40L/दिन और पशु के लिए 70L/दिन की न्यूनतम गारंटी देता है।"
+    pillar3_desc: "Google OR-Tools का उपयोग करके पानी के टैंकरों का रूट तय किया जाता है। यह हर इंसान के लिए 40L/दिन और पशु के लिए 70L/दिन की न्यूनतम गारंटी देता है।",
+    stat_depleted: "जल संकटग्रस्त गाँव",
+    stat_warning: "चेतावनी क्षेत्र",
+    stat_human: "मानव न्यूनतम कोटा",
+    stat_cattle: "पशुधन कोटा",
+    btn_dispatch: "आपातकालीन जल वितरण शुरू करें",
+    btn_freeze: "ठेकेदार का भुगतान रोकें",
+    audit_title: "आधिकारिक क्रिप्टोग्राफिक लेजर"
   }
 };
 
@@ -74,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedLang = e.target.value;
       localStorage.setItem("jalsanjeevani_lang", selectedLang);
       
-      // Sync all other dropdowns on the page
+      // Sync all dropdowns on the page
       switchers.forEach(s => s.value = selectedLang);
       
       applyTranslation(selectedLang);

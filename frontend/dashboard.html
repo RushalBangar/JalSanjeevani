@@ -30,6 +30,8 @@
       <div class="nav-badge">
         <span class="status-dot"></span>
         <span>Copernicus Sentinel-2: Active</span>
+        <span style="opacity: 0.4;">|</span>
+        <span id="liveClock" style="font-family: var(--font-mono); color: var(--primary-color);">UTC 00:00:00</span>
       </div>
 
       <!-- Quick Role / App Switcher -->
@@ -106,11 +108,24 @@
         </div>
       </div>
 
-      <!-- Village Distress Queue -->
+      <!-- Village Distress Queue with Search & Filters -->
       <div>
         <div class="panel-header">
-          <span class="panel-title">Village Scarcity Matrix (Click to Locate)</span>
+          <span class="panel-title">Village Scarcity Matrix</span>
+          <span class="font-mono" style="font-size: 0.7rem; color: var(--text-dim);" id="matrixCounter">4 hamlets</span>
         </div>
+        
+        <!-- Search and Filter Pills -->
+        <div class="matrix-filter-bar">
+          <input type="text" id="villageSearchInput" class="matrix-search" placeholder="Search village (e.g. Pangari)..." aria-label="Search village">
+          <div class="filter-pills" id="filterPillsContainer">
+            <button class="filter-pill active" data-filter="all">All (4)</button>
+            <button class="filter-pill critical" data-filter="critical">Critical (2)</button>
+            <button class="filter-pill warning" data-filter="warning">Warning (1)</button>
+            <button class="filter-pill safe" data-filter="safe">Safe (1)</button>
+          </div>
+        </div>
+
         <div class="village-list" id="villageListContainer">
           <!-- Rendered dynamically by dashboard.js -->
         </div>
@@ -128,8 +143,16 @@
         <button id="btnAllocate" class="btn btn-primary btn-block">
           Execute Emergency Dispatch
         </button>
-        <div class="solver-result" id="solverResultBox">
-          ✓ Dispatch Matrix Computed: 2 Tanker Routes Generated • 0 Hamlets Skipped • -28.4% Diesel Burn
+        <div class="solver-result" id="solverResultBox" style="display: none;">
+          <div style="font-weight: 700; color: var(--telemetry-emerald); margin-bottom: 4px;">
+            ✓ OR-Tools Optimal Dispatch Computed
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+            2 Tanker Circuits Generated • 3 Hamlets Allocated • 0 Skipped • -28.4% Diesel Burn
+          </div>
+          <button id="btnExportManifest" class="btn btn-outline btn-sm" style="margin-top: 8px; width: 100%; font-size: 0.72rem; padding: 4px 8px;">
+            📄 Download Route Manifest (.JSON)
+          </button>
         </div>
       </div>
 
@@ -146,6 +169,14 @@
         <div class="hud-panel">
           <span class="hud-tag">Hydro-Telemetry Node</span>
           <span class="hud-value" style="color: var(--telemetry-emerald);">Copernicus SAR Sentinel-1 + NASA SMAP Synced</span>
+        </div>
+        <div class="hud-panel layer-control-panel">
+          <span class="hud-tag">Active Layers</span>
+          <div class="hud-layer-btns">
+            <button id="toggleVillages" class="layer-pill active" title="Toggle village markers">🏘️ Hamlets</button>
+            <button id="toggleFleet" class="layer-pill active" title="Toggle tanker fleet markers">🚛 Fleet GPS</button>
+            <button id="toggleRogue" class="layer-pill active" title="Toggle diversion alerts">⚠️ Anomalies</button>
+          </div>
         </div>
       </div>
 
