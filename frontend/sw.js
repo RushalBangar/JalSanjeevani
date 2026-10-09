@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jalsetu-cache-v1';
+const CACHE_NAME = 'jalsanjeevani-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

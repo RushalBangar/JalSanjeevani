@@ -3,7 +3,7 @@ const translations = {
     hero_badge: "AI-Powered Scarcity Prediction",
     nav_login: "Portal Login",
     hero_title: "Smart Operations for Sustainable Drought Relief",
-    hero_desc: "JalSetu (जलसेतू) is an end-to-end intelligent platform that predicts regional water scarcity, stops tanker diversion via cryptographic validation, and optimizes delivery routes to ensure equitable access for both humans and livestock.",
+    hero_desc: "JalSanjeevani (जलसंजीवनी) is an end-to-end intelligent platform that predicts regional water scarcity, stops tanker diversion via cryptographic validation, and optimizes delivery routes to ensure equitable access for both humans and livestock.",
     hero_btn_discover: "Discover the Pillars",
     hero_btn_access: "Access Command Dashboard",
     pillars_title: "The 3-Pillar Solution Architecture",
@@ -18,7 +18,7 @@ const translations = {
     hero_badge: "एआय (AI) द्वारे पाणीटंचाईचा अंदाज",
     nav_login: "पोर्टल लॉगिन",
     hero_title: "शाश्वत दुष्काळ निवारणासाठी स्मार्ट ऑपरेशन्स",
-    hero_desc: "जलसेतू हे एक बुद्धिमान तंत्रज्ञान आहे जे दुष्काळाची १४ दिवस आधी पूर्वसूचना देते, क्यूआर (QR) पडताळणीद्वारे टँकर माफियांची चोरी थांबवते आणि माणसे व जनावरे दोघांनाही समान पाणीवाटप सुनिश्चित करते.",
+    hero_desc: "जलसंजीवनी हे एक बुद्धिमान तंत्रज्ञान आहे जे दुष्काळाची १४ दिवस आधी पूर्वसूचना देते, क्यूआर (QR) पडताळणीद्वारे टँकर माफियांची चोरी थांबवते आणि माणसे व जनावरे दोघांनाही समान पाणीवाटप सुनिश्चित करते.",
     hero_btn_discover: "प्रकल्पाची माहिती घ्या",
     hero_btn_access: "कमांड डॅशबोर्ड उघडा",
     pillars_title: "प्रकल्पाचे ३ मुख्य स्तंभ",
@@ -33,7 +33,7 @@ const translations = {
     hero_badge: "एआई (AI) द्वारा जल संकट की भविष्यवाणी",
     nav_login: "पोर्टल लॉगिन",
     hero_title: "स्थायी सूखा राहत के लिए स्मार्ट ऑपरेशन्स",
-    hero_desc: "जलसेतु (JalSetu) एक इंटेलिजेंट प्लेटफॉर्म है जो 14 दिन पहले पानी के संकट की भविष्यवाणी करता है, क्रिप्टोग्राफ़िक सत्यापन के माध्यम से टैंकर माफिया को रोकता है, और मनुष्यों और पशुओं दोनों के लिए उचित जल वितरण सुनिश्चित करता है।",
+    hero_desc: "जलसंजीवनी (JalSanjeevani) एक इंटेलिजेंट प्लेटफॉर्म है जो 14 दिन पहले पानी के संकट की भविष्यवाणी करता है, क्रिप्टोग्राफ़िक सत्यापन के माध्यम से टैंकर माफिया को रोकता है, और मनुष्यों और पशुओं दोनों के लिए उचित जल वितरण सुनिश्चित करता है।",
     hero_btn_discover: "प्रोजेक्ट के बारे में जानें",
     hero_btn_access: "कमांड डैशबोर्ड खोलें",
     pillars_title: "प्रोजेक्ट के 3 मुख्य स्तंभ",
@@ -50,14 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const langSwitcher = document.getElementById("langSwitcher");
   
   // Check local storage for saved language
-  const savedLang = localStorage.getItem("jalsetu_lang") || "en";
+  const savedLang = localStorage.getItem("jalsanjeevani_lang") || "en";
   langSwitcher.value = savedLang;
   applyTranslation(savedLang);
 
   // Handle language change
   langSwitcher.addEventListener("change", (e) => {
     const selectedLang = e.target.value;
-    localStorage.setItem("jalsetu_lang", selectedLang);
+    localStorage.setItem("jalsanjeevani_lang", selectedLang);
     applyTranslation(selectedLang);
   });
 });

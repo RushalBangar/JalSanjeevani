@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List
 from solver import optimize_routes
 
-app = FastAPI(title="JalSetu Logistics API")
+app = FastAPI(title="JalSanjeevani Logistics API")
 
 # Allow frontend to call this API locally
 app.add_middleware(
@@ -48,4 +48,4 @@ async def allocate_tankers(request: DispatchRequest):
 
 @app.get("/health")
 def health_check():
-    return {"status": "online", "service": "JalSetu Routing Engine"}
+    return {"status": "online", "service": "JalSanjeevani Routing Engine"}

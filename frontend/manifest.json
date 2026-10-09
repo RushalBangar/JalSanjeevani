@@ -1,6 +1,6 @@
 {
-  "name": "JalSetu Field PWA",
-  "short_name": "JalSetu",
+  "name": "JalSanjeevani Field PWA",
+  "short_name": "JalSanjeevani",
   "description": "Offline-first water tanker delivery verification system.",
   "start_url": "/index.html",
   "display": "standalone",
