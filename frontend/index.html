@@ -1,89 +1,614 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
   <title>JalSanjeevani | Smart Drought Water Supply Chain</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/landing.css">
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; } 
+      body { overscroll-behavior: none; } 
+      main > :first-child { margin-top: 0 !important; } 
+      main > :last-child { margin-bottom: 0 !important; } 
+    } 
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-container": "#00626e", "on-secondary-container": "#002955", "surface-container-lowest": "#070e1a", "on-surface": "#dce2f4", "alert-amber": "#F59E0B", "surface-container-low": "#151c28", "outline": "#849396", "surface-glass-border": "rgba(56, 189, 248, 0.15)", "surface": "#0c1320", "on-secondary-fixed": "#001b3c", "telemetry-emerald-glow": "rgba(16, 185, 129, 0.25)", "surface-container": "#19202c", "secondary-container": "#3491ff", "on-secondary": "#003061", "tertiary-fixed-dim": "#4cd6fb", "surface-container-high": "#232a37", "inverse-on-surface": "#2a313e", "surface-glass-border-bright": "rgba(0, 229, 255, 0.35)", "surface-slate": "#0B1323", "inverse-surface": "#dce2f4", "background": "#0c1320", "primary": "#c3f5ff", "on-surface-variant": "#bac9cc", "secondary-fixed-dim": "#a8c8ff", "outline-variant": "#3b494c", "telemetry-emerald": "#10B981", "alert-critical-red": "#EF4444", "tertiary-fixed": "#b3ebff", "surface-bright": "#323947", "on-primary": "#00363d", "tertiary-container": "#71deff", "error-container": "#93000a", "surface-dim": "#0c1320", "on-tertiary": "#003642", "secondary": "#a8c8ff", "primary-fixed": "#9cf0ff", "on-primary-fixed": "#001f24", "on-secondary-fixed-variant": "#004689", "text-secondary": "#94A3B8", "secondary-fixed": "#d5e3ff", "on-tertiary-fixed": "#001f27", "surface-container-highest": "#2e3542", "on-error-container": "#ffdad6", "surface-glass": "rgba(15, 23, 42, 0.65)", "on-primary-fixed-variant": "#004f58", "surface-variant": "#2e3542", "on-error": "#690005", "primary-fixed-dim": "#00daf3", "text-muted": "#64748B", "on-tertiary-container": "#006176", "error": "#ffb4ab", "on-tertiary-fixed-variant": "#004e5f", "primary-container": "#00e5ff", "on-background": "#dce2f4", "inverse-primary": "#006875", "tertiary": "#cff2ff", "surface-tint": "#00daf3", "text-primary": "#F8FAFC" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-2xl": "4rem", "space-xl": "2.5rem", "space-sm": "0.5rem", "margin": "2rem", "space-md": "1rem", "gutter": "1.5rem", "margin-mobile": "1rem" }, "fontFamily": { "telemetry-metric-sm": [ "JetBrains Mono" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "telemetry-metric-lg": [ "JetBrains Mono" ], "label-caps": [ "JetBrains Mono" ], "label-ui": [ "Inter" ], "body-sm": [ "Inter" ], "display-hero-mobile": [ "Plus Jakarta Sans" ], "display-hero": [ "Plus Jakarta Sans" ], "body-lg": [ "Inter" ], "headline-lg": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "body-md": [ "Inter" ], "headline-sm": [ "Plus Jakarta Sans" ] }, "fontSize": { "telemetry-metric-sm": [ "16px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "headline-lg-mobile": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "telemetry-metric-lg": [ "28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "label-caps": [ "11px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" } ], "label-ui": [ "13px", { "lineHeight": "16px", "fontWeight": "500" } ], "body-sm": [ "13px", { "lineHeight": "20px", "fontWeight": "400" } ], "display-hero-mobile": [ "36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" } ], "display-hero": [ "56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "headline-lg": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-md": [ "20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "body-md": [ "15px", { "lineHeight": "24px", "fontWeight": "400" } ], "headline-sm": [ "16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "600" } ] } } };
+  </script>
 </head>
-<body>
-
-  <!-- Navigation -->
-  <nav class="main-nav">
-    <div class="logo">
-      <img src="assets/logo.jpg" alt="JalSanjeevani Logo" style="height: 48px; border-radius: 6px;">
-    </div>
-
-    <div class="nav-links">
-      <a href="#about" data-i18n="nav_about">Features</a>
-      <a href="#about" data-i18n="nav_tech">Technology</a>
-      <a href="#about" data-i18n="nav_impact">Impact</a>
-    </div>
-
-    <div class="nav-actions">
-      <div class="lang-container">
-        <select id="langSwitcher" class="lang-switcher">
-          <option value="en">English</option>
-          <option value="mr">मराठी</option>
-          <option value="hi">हिंदी</option>
-        </select>
-      </div>
-      <a href="login.html" class="btn btn-outline" data-i18n="nav_login">Portal Login</a>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <span class="hero-badge" data-i18n="hero_badge">AI-Powered Scarcity Prediction</span>
-        <h1 data-i18n="hero_title">Smart Operations for Sustainable Drought Relief</h1>
-        <p data-i18n="hero_desc">JalSanjeevani (जलसंजीवनी) is an end-to-end intelligent platform that predicts regional water scarcity, stops tanker diversion via cryptographic validation, and optimizes delivery routes to ensure equitable access for both humans and livestock.</p>
-        <div class="hero-buttons">
-          <a href="#about" class="btn btn-primary" data-i18n="hero_btn_discover">Discover the Pillars</a>
-          <a href="login.html" class="btn btn-outline" data-i18n="hero_btn_access">Access Command Dashboard</a>
+<body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-slate/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]">
+    <div class="h-20 w-full px-gutter max-w-7xl mx-auto flex items-center justify-between gap-space-md">
+      <div class="flex items-center gap-space-md">
+        <a class="flex items-center gap-3 group" data-path="landing" href="#">
+          <img alt="JalSanjeevani Logo" class="h-10 w-auto object-contain rounded-md" src="assets/logo.jpg"/>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-text-primary tracking-tight leading-none group-hover:text-primary transition-colors">JalSanjeevani</span>
+            <span class="font-label-caps text-label-caps text-text-muted uppercase leading-tight">Sanjeevani Grid</span>
+          </div>
+        </a>
+        <div class="hidden xl:flex items-center gap-2 pl-space-md py-1">
+          <div class="flex items-center gap-2 px-space-sm py-1 rounded-full bg-surface-container-low">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-telemetry-emerald opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-telemetry-emerald shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+            </span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Copernicus Telemetry:</span>
+            <span class="font-label-caps text-label-caps text-telemetry-emerald font-semibold uppercase">Online</span>
+          </div>
         </div>
       </div>
-      
-      <div class="hero-visual">
-        <img src="assets/hero-mockup.jpg" alt="JalSanjeevani Command Dashboard Mockup" class="hero-image">
+      <nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary-container font-semibold">
+        <a aria-current="page" class="transition-colors text-primary-container font-semibold" data-path="landing" href="#">Features</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-path="technology" href="#">Technology</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-path="pillars" href="#">Pillars</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-path="telemetry-live" href="#">Telemetry Live</a>
+        <a class="text-on-surface-variant font-label-ui text-label-ui hover:text-on-surface transition-colors" data-path="impact" href="#">Impact</a>
+      </nav>
+      <div class="flex items-center gap-space-sm">
+        <div class="relative hidden sm:block">
+          <select aria-label="Language Selector" id="langSwitcher" class="lang-switcher appearance-none bg-surface-container-low text-on-surface font-label-ui text-label-ui rounded-lg pl-3 pr-8 py-2 focus:outline-none transition-colors">
+            <option value="en">English</option>
+            <option value="mr">मराठी</option>
+            <option value="hi">हिंदी</option>
+          </select>
+          <span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">expand_more</span>
+        </div>
+        <a class="hidden sm:inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright hover:text-text-primary transition-all" data-path="login" href="login.html">Portal Login</a>
+        <a class="inline-flex items-center justify-center font-label-ui text-label-ui font-semibold px-4 py-2 rounded-lg bg-primary-container text-on-primary-container hover:bg-tertiary-container hover:text-on-tertiary-container shadow-[0_0_16px_rgba(0,229,255,0.25)] transition-all" data-path="dashboard-overview" href="dashboard.html">Access Dashboard</a>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-1">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+        <button aria-label="Toggle Mobile Menu" class="lg:hidden flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high focus:outline-none" type="button">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
       </div>
     </div>
-  </section>
-
-  <!-- Architecture Pillars -->
-  <section id="about" class="pillars">
-    <h2 class="section-title" data-i18n="pillars_title">The 3-Pillar Solution Architecture</h2>
-    <div class="pillars-grid">
-      
-      <!-- Pillar 1 -->
-      <div class="pillar-card glass-panel">
-        <span class="pillar-icon">🛰️</span>
-        <h3 data-i18n="pillar1_title">Predictive Early Warning</h3>
-        <p data-i18n="pillar1_desc">Using open geospatial telemetry (ESA Copernicus & NASA SMAP), we compute a localized Water Depletion Index. Predict village groundwater failure up to 14 days in advance, moving from reactive to proactive relief.</p>
+  </header>
+  <main class="w-full pt-20 bg-surface min-h-[calc(100vh-80px)]">
+    <div class="flex flex-col w-full">
+      <div class="relative w-full overflow-hidden">
+        <div class="absolute -top-40 left-1/4 w-96 h-96 rounded-full bg-secondary-container/10 blur-[120px] pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-[500px] h-[500px] rounded-full bg-primary-container/10 blur-[140px] pointer-events-none"></div>
+        <div class="absolute bottom-10 left-10 w-80 h-80 rounded-full bg-telemetry-emerald/5 blur-[100px] pointer-events-none"></div>
+        
+        <section class="max-w-7xl mx-auto px-gutter py-space-xl lg:py-space-2xl w-full">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+            
+            <div class="lg:col-span-6 flex flex-col gap-space-md z-10">
+              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface-container-low self-start shadow-sm">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary-container"></span>
+                </span>
+                <span class="font-label-caps text-label-caps text-primary tracking-widest uppercase">
+                  AI-POWERED SCARCITY PREDICTION
+                </span>
+              </div>
+              
+              <h1 class="font-display-hero text-display-hero-mobile md:text-display-hero text-text-primary tracking-tight font-extrabold leading-[1.08]">
+                Smart Operations for Sustainable Drought Relief
+              </h1>
+              
+              <p class="font-body-lg text-body-lg text-text-secondary leading-relaxed max-w-xl">
+                JalSanjeevani (जलसंजीवनी) is an end-to-end intelligent platform that predicts regional water scarcity, stops tanker diversion via cryptographic validation, and optimizes delivery routes to ensure equitable access for both humans and livestock.
+              </p>
+              
+              <div class="flex flex-wrap items-center gap-space-md pt-space-xs">
+                <a class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-primary-container to-secondary-container text-on-secondary font-headline-sm text-headline-sm font-semibold tracking-wide shadow-lg hover:opacity-95 transition-all" href="#pillars-section">
+                  <span class="material-symbols-outlined text-[20px]">explore</span>
+                  Discover the Pillars
+                </a>
+                <a class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-surface-container-high text-primary hover:text-text-primary hover:bg-surface-bright font-headline-sm text-headline-sm font-semibold shadow-md transition-all" data-path="login" href="login.html">
+                  <span class="material-symbols-outlined text-[20px]">terminal</span>
+                  Access Command Dashboard
+                </a>
+              </div>
+              
+              <div class="grid grid-cols-3 gap-3 pt-space-lg">
+                <div class="p-3.5 rounded-xl bg-surface-container-low/90 flex flex-col gap-1 shadow-sm">
+                  <div class="flex items-center gap-1.5 text-primary">
+                    <span class="material-symbols-outlined text-[18px]">satellite_alt</span>
+                    <span class="font-label-caps text-label-caps uppercase text-text-muted">Forecast</span>
+                  </div>
+                  <div class="font-telemetry-metric-lg text-telemetry-metric-lg text-text-primary">14-Day</div>
+                  <span class="font-body-sm text-body-sm text-text-secondary">Advance Warning</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/90 flex flex-col gap-1 shadow-sm">
+                  <div class="flex items-center gap-1.5 text-telemetry-emerald">
+                    <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                    <span class="font-label-caps text-label-caps uppercase text-text-muted">Diversion</span>
+                  </div>
+                  <div class="font-telemetry-metric-lg text-telemetry-metric-lg text-telemetry-emerald">100%</div>
+                  <span class="font-body-sm text-body-sm text-text-secondary">Mafia Interception</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/90 flex flex-col gap-1 shadow-sm">
+                  <div class="flex items-center gap-1.5 text-secondary">
+                    <span class="material-symbols-outlined text-[18px]">water_ec</span>
+                    <span class="font-label-caps text-label-caps uppercase text-text-muted">Quotas</span>
+                  </div>
+                  <div class="font-telemetry-metric-lg text-telemetry-metric-lg text-text-primary">40L / 70L</div>
+                  <span class="font-body-sm text-body-sm text-text-secondary">Human &amp; Cattle Min</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="lg:col-span-6 relative">
+              <div class="p-space-md sm:p-space-lg rounded-2xl bg-surface-container-low/95 shadow-2xl flex flex-col gap-space-md">
+                <div class="flex items-center justify-between pb-3 bg-surface-container/60 p-3 rounded-xl">
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-alert-critical-red animate-pulse"></div>
+                    <div class="flex flex-col">
+                      <div class="flex items-center gap-2">
+                        <span class="font-headline-sm text-headline-sm text-text-primary tracking-tight">REGIONAL WATER NETWORK</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] bg-alert-critical-red/20 text-alert-critical-red font-mono font-bold tracking-wider">LIVE CRITICAL</span>
+                      </div>
+                      <span class="font-label-caps text-label-caps text-text-muted">COP-SENTINEL-2 • TELEMETRY NODE #884-MH</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-md bg-surface-container-high text-primary font-label-caps text-label-caps uppercase">OR-Tools Solver: Active</span>
+                  </div>
+                </div>
+                
+                <div class="relative w-full h-64 sm:h-72 rounded-xl bg-surface-container-lowest overflow-hidden">
+                  <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+                  <svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 600 300">
+                    <path d="M 320,180 Q 420,150 490,210 T 560,260 T 380,280 Z" fill="#EF4444" fill-opacity="0.18" stroke="#EF4444" stroke-dasharray="4 2" stroke-width="1.5"></path>
+                    <path d="M 120,80 Q 230,40 310,120 T 260,210 T 90,170 Z" fill="#F59E0B" fill-opacity="0.14" stroke="#F59E0B" stroke-width="1.2"></path>
+                    <path d="M 140,95 L 210,135 L 340,110 L 440,165" fill="none" stroke="#00E5FF" stroke-linecap="round" stroke-width="2.5"></path>
+                    <circle class="animate-ping" cx="140" cy="95" fill="#00E5FF" opacity="0.6" r="4"></circle>
+                    <circle cx="140" cy="95" fill="#00E5FF" r="3"></circle>
+                    <circle cx="210" cy="135" fill="#00E5FF" r="3"></circle>
+                    <circle cx="340" cy="110" fill="#00E5FF" r="3"></circle>
+                    <circle cx="440" cy="165" fill="#10B981" fill-opacity="0.25" r="14" stroke="#10B981" stroke-width="1"></circle>
+                    <circle cx="440" cy="165" fill="#10B981" r="4"></circle>
+                    <circle class="animate-ping" cx="280" cy="200" fill="#EF4444" opacity="0.8" r="6"></circle>
+                    <circle cx="280" cy="200" fill="#EF4444" r="3.5"></circle>
+                  </svg>
+                  
+                  <div class="absolute top-3 left-3 px-2.5 py-1.5 rounded-lg bg-surface-slate/90 backdrop-blur-md shadow-md flex flex-col gap-0.5">
+                    <span class="font-label-caps text-label-caps text-text-muted">SECTOR: MARATHWADA-EAST</span>
+                    <span class="font-label-ui text-label-ui text-text-primary font-semibold flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-alert-critical-red"></span> Red Zone: 14 Tankers Queued
+                    </span>
+                  </div>
+                  
+                  <div class="absolute bottom-3 left-3 px-3 py-2 rounded-lg bg-surface-slate/90 backdrop-blur-md shadow-md flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary-container text-[20px]">local_shipping</span>
+                    <div class="flex flex-col">
+                      <span class="font-label-caps text-label-caps text-primary">ROUTE #MH-42-TKR</span>
+                      <span class="font-label-ui text-label-ui text-text-primary font-mono">12,000L • ETA 18 MIN</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded bg-telemetry-emerald/20 text-telemetry-emerald font-label-caps text-label-caps">GEOFENCE LOCKED</span>
+                  </div>
+                  <div class="absolute top-3 right-3 px-2.5 py-1.5 rounded-lg bg-surface-slate/90 backdrop-blur-md shadow-md flex flex-col text-right">
+                    <span class="font-label-caps text-label-caps text-text-muted">SENSOR NETWORK</span>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-telemetry-emerald">479 STABLE / 28 WARN</span>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div class="p-3 rounded-xl bg-surface-container flex flex-col">
+                    <span class="font-label-caps text-label-caps text-text-muted">TOTAL ALLOCATION</span>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-text-primary mt-1">1.28M L</span>
+                    <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                      <div class="bg-primary-container h-full rounded-full" style="width: 78%;"></div>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-surface-container flex flex-col">
+                    <span class="font-label-caps text-label-caps text-text-muted">TRANSIT VARIANCE</span>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-telemetry-emerald mt-1">0.02%</span>
+                    <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                      <div class="bg-telemetry-emerald h-full rounded-full" style="width: 98%;"></div>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-surface-container flex flex-col">
+                    <span class="font-label-caps text-label-caps text-text-muted">AQUIFER DRAW</span>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-alert-amber mt-1">4.8 bar[G]</span>
+                    <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                      <div class="bg-alert-amber h-full rounded-full" style="width: 84%;"></div>
+                    </div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-surface-container flex flex-col">
+                    <span class="font-label-caps text-label-caps text-text-muted">QR CRYPTO AUDIT</span>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-primary mt-1">100% OK</span>
+                    <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                      <div class="bg-primary h-full rounded-full" style="width: 100%;"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="p-3.5 rounded-xl bg-surface-container/70 flex flex-col gap-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider">Regional Reservoir Depletion Barometers</span>
+                    <span class="font-label-caps text-label-caps text-alert-critical-red">2 RESERVOIRS BELOW STATUTORY DEAD STORAGE</span>
+                  </div>
+                  <div class="grid grid-cols-4 gap-2 pt-1">
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps text-text-muted mb-1">
+                        <span>Res-A</span><span>68%</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-telemetry-emerald h-full" style="width: 68%"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps text-text-muted mb-1">
+                        <span>Res-B</span><span>41%</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-alert-amber h-full" style="width: 41%"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps text-text-muted mb-1">
+                        <span>Res-C</span><span class="text-alert-critical-red">19%</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-alert-critical-red h-full" style="width: 19%"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps text-text-muted mb-1">
+                        <span>Res-D</span><span class="text-alert-critical-red">12%</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-alert-critical-red h-full" style="width: 12%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="max-w-7xl mx-auto px-gutter py-space-xl lg:py-space-2xl w-full" id="pillars-section">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
+            <div class="flex flex-col gap-2 max-w-2xl">
+              <div class="flex items-center gap-2 text-primary font-label-caps text-label-caps uppercase tracking-widest">
+                <span class="w-6 h-px bg-primary-container"></span>
+                Technical Foundation
+              </div>
+              <h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-text-primary tracking-tight font-bold">
+                The 3-Pillar Solution Architecture
+              </h2>
+              <p class="font-body-md text-body-md text-text-secondary">
+                Engineered to overcome institutional inertia, corruption in water trucking, and unpredictable climate patterns through decentralized geospatial telemetry.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">
+                PROTOCOL SPECIFICATION V3.4 • SECURE DEPLOYMENT
+              </span>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">
+            <div class="flex flex-col justify-between p-space-lg rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all group shadow-md">
+              <div class="flex flex-col gap-space-md">
+                <div class="flex items-center justify-between">
+                  <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-primary-container shadow-inner">
+                    <span class="material-symbols-outlined text-[32px]">satellite_alt</span>
+                  </div>
+                  <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-text-muted">01 / PILLAR</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-text-primary tracking-tight font-bold mt-2">
+                  Predictive Early Warning
+                </h3>
+                <p class="font-body-md text-body-md text-text-secondary leading-relaxed">
+                  Using open geospatial telemetry (ESA Copernicus &amp; NASA SMAP), we compute a localized Water Depletion Index. Predict village groundwater failure up to 14 days in advance, moving from reactive to proactive relief.
+                </p>
+                <div class="p-space-md rounded-xl bg-surface-container-lowest/80 flex flex-col gap-3 mt-space-sm">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-alert-amber text-[18px]">warning</span>
+                      <span class="font-label-caps text-label-caps text-text-primary font-bold">WATER DEPLETION INDEX</span>
+                    </div>
+                    <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-alert-critical-red">0.78 Critical</span>
+                  </div>
+                  <div class="w-full h-16 relative">
+                    <svg class="w-full h-full" fill="none" preserveaspectratio="none" viewbox="0 0 260 64">
+                      <defs>
+                        <lineargradient id="depletionGrad" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stop-color="#EF4444" stop-opacity="0.3"></stop>
+                          <stop offset="100%" stop-color="#EF4444" stop-opacity="0.0"></stop>
+                        </lineargradient>
+                      </defs>
+                      <path d="M 0,10 Q 40,12 80,24 T 160,42 T 260,58 L 260,64 L 0,64 Z" fill="url(#depletionGrad)"></path>
+                      <path d="M 0,10 Q 40,12 80,24 T 160,42 T 260,58" stroke="#EF4444" stroke-linecap="round" stroke-width="2"></path>
+                      <circle cx="260" cy="58" fill="#EF4444" r="4"></circle>
+                    </svg>
+                  </div>
+                  <div class="flex items-center justify-between font-label-caps text-label-caps text-text-muted">
+                    <span>Aquifer Trend: -4.2 cm/day</span>
+                    <span class="text-primary">T-14 Days to Zero Point</span>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-space-md flex items-center justify-between text-on-surface-variant font-label-caps text-label-caps">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>ESA Copernicus Live Sync</span>
+                <span class="text-primary group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-col justify-between p-space-lg rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all group shadow-md">
+              <div class="flex flex-col gap-space-md">
+                <div class="flex items-center justify-between">
+                  <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-primary-container shadow-inner">
+                    <span class="material-symbols-outlined text-[32px]">lock</span>
+                  </div>
+                  <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-text-muted">02 / PILLAR</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-text-primary tracking-tight font-bold mt-2">
+                  Anti-Diversion &amp; Proof-of-Delivery
+                </h3>
+                <p class="font-body-md text-body-md text-text-secondary leading-relaxed">
+                  Eliminate the Tanker Mafia. A dual-key offline-first cryptographic QR handshake at geofenced community cisterns ensures water is delivered to the people, not sold to private commercial entities.
+                </p>
+                <div class="p-space-md rounded-xl bg-surface-container-lowest/80 flex flex-col gap-3 mt-space-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps text-text-primary font-bold">DUAL-KEY CRYPTO HANDSHAKE</span>
+                    <span class="px-2 py-0.5 rounded bg-telemetry-emerald/20 text-telemetry-emerald font-label-caps text-label-caps">VERIFIED</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 text-center py-2">
+                    <div class="p-2 rounded-lg bg-surface-container flex flex-col items-center">
+                      <span class="material-symbols-outlined text-primary text-[20px]">qr_code_scanner</span>
+                      <span class="font-label-caps text-label-caps text-text-muted mt-1">Driver Key</span>
+                      <span class="text-[10px] font-mono text-primary font-semibold">0x9F3B..</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center text-text-muted">
+                      <span class="material-symbols-outlined text-[18px] text-telemetry-emerald">link</span>
+                      <span class="font-label-caps text-label-caps text-telemetry-emerald text-[9px] mt-0.5">OFFLINE P2P</span>
+                    </div>
+                    <div class="p-2 rounded-lg bg-surface-container flex flex-col items-center">
+                      <span class="material-symbols-outlined text-secondary text-[20px]">pin_drop</span>
+                      <span class="font-label-caps text-label-caps text-text-muted mt-1">Cistern Key</span>
+                      <span class="text-[10px] font-mono text-secondary font-semibold">0x74CE..</span>
+                    </div>
+                  </div>
+                  <div class="p-2 rounded bg-surface-container flex items-center justify-between text-[11px] font-mono text-text-secondary">
+                    <span>Geofence Radius: 15m Circle</span>
+                    <span class="text-telemetry-emerald font-semibold">✓ Inside Cistern Perimeter</span>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-space-md flex items-center justify-between text-on-surface-variant font-label-caps text-label-caps">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>Zero Commercial Leakage</span>
+                <span class="text-primary group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+            
+            <div class="flex flex-col justify-between p-space-lg rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all group shadow-md">
+              <div class="flex flex-col gap-space-md">
+                <div class="flex items-center justify-between">
+                  <div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-primary-container shadow-inner">
+                    <span class="material-symbols-outlined text-[32px]">alt_route</span>
+                  </div>
+                  <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-text-muted">03 / PILLAR</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-text-primary tracking-tight font-bold mt-2">
+                  Multi-Objective Logistics Solver
+                </h3>
+                <p class="font-body-md text-body-md text-text-secondary leading-relaxed">
+                  Mathematical fair-share distribution routing using Google OR-Tools. Guarantees a minimum statutory quota of 40L/day for humans and 70L/day for cattle, minimizing diesel burn and eliminating skipped hamlets.
+                </p>
+                <div class="p-space-md rounded-xl bg-surface-container-lowest/80 flex flex-col gap-3 mt-space-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps text-text-primary font-bold">STATUTORY QUOTA ALLOCATIONS</span>
+                    <span class="font-label-caps text-label-caps text-primary">OR-Tools VRP</span>
+                  </div>
+                  <div class="space-y-2">
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps mb-1">
+                        <span class="text-text-muted">Human Minimum (40L/day)</span>
+                        <span class="text-text-primary font-mono font-semibold">100% Fulfilled</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-primary-container h-full" style="width: 100%;"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between font-label-caps text-label-caps mb-1">
+                        <span class="text-text-muted">Cattle Sustenance (70L/day)</span>
+                        <span class="text-text-primary font-mono font-semibold">100% Fulfilled</span>
+                      </div>
+                      <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+                        <div class="bg-secondary-container h-full" style="width: 100%;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-2 rounded bg-surface-container flex items-center justify-between font-mono text-[11px]">
+                    <span class="text-text-secondary">Fleet Diesel Conservation:</span>
+                    <span class="text-telemetry-emerald font-bold">-28.4% Fleet Burn</span>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-space-md flex items-center justify-between text-on-surface-variant font-label-caps text-label-caps">
+                <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>Zero Skipped Hamlets</span>
+                <span class="text-primary group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="max-w-7xl mx-auto px-gutter py-space-xl w-full">
+          <div class="p-space-lg lg:p-space-xl rounded-2xl bg-surface-container-low shadow-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-center">
+              <div class="lg:col-span-7 flex flex-col gap-space-md">
+                <div class="flex items-center gap-2 text-primary font-label-caps text-label-caps uppercase tracking-widest">
+                  <span class="material-symbols-outlined text-[16px]">sensors</span>
+                  Groundwater Sensing &amp; Civil Defense Protocol
+                </div>
+                <h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-text-primary font-bold">
+                  Predictive Hydro-Intelligence Built For Extreme Climes
+                </h3>
+                <p class="font-body-md text-body-md text-text-secondary leading-relaxed">
+                  JalSanjeevani processes multi-band synthetic aperture radar (SAR) from Copernicus Sentinel-1 with radiometric soil moisture observations from NASA SMAP. The neural model isolates localized aquifer withdrawal rates, calculating depletion velocity 14 days before tube-wells yield silt.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-space-xs">
+                  <div class="p-3.5 rounded-xl bg-surface-container flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary-container text-[24px]">verified</span>
+                    <div>
+                      <span class="font-headline-sm text-headline-sm text-text-primary block">Offline-First Protocol</span>
+                      <span class="font-body-sm text-body-sm text-text-secondary">Drivers validate delivery via P2P Bluetooth and asymmetric QR pairs without cellular connectivity.</span>
+                    </div>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-surface-container flex items-start gap-3">
+                    <span class="material-symbols-outlined text-telemetry-emerald text-[24px]">balance</span>
+                    <div>
+                      <span class="font-headline-sm text-headline-sm text-text-primary block">Statutory Equity Engine</span>
+                      <span class="font-body-sm text-body-sm text-text-secondary">Constrained optimization prevents tanker monopolies from starving marginalized settlements.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="lg:col-span-5 flex flex-col gap-3">
+                <div class="p-space-md rounded-xl bg-surface-container-lowest flex flex-col gap-3 shadow-inner">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps text-text-primary font-bold">DISPATCH QUEUE EXECUTION</span>
+                    <span class="font-label-caps text-label-caps text-telemetry-emerald">99.4% SLA COMPLIANCE</span>
+                  </div>
+                  <div class="space-y-2">
+                    <div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-telemetry-emerald"></span>
+                        <span class="font-body-sm text-body-sm text-text-primary">Gevrai Cistern #4</span>
+                      </div>
+                      <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-telemetry-emerald">Delivered (40L/Cap)</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                        <span class="font-body-sm text-body-sm text-text-primary">Ambad Taluka Sector C</span>
+                      </div>
+                      <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-primary">In Transit (ETA 8m)</span>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-surface-container flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-alert-amber"></span>
+                        <span class="font-body-sm text-body-sm text-text-primary">Kaij Livestock Enclosure</span>
+                      </div>
+                      <span class="font-telemetry-metric-sm text-telemetry-metric-sm text-alert-amber">Dispatched (70L/Bov)</span>
+                    </div>
+                  </div>
+                  <div class="pt-2 flex items-center justify-between">
+                    <a class="w-full py-2.5 rounded-lg bg-surface-container-high text-primary hover:bg-surface-bright text-center font-headline-sm text-headline-sm font-semibold transition-all" data-path="dashboard-overview" href="dashboard.html">
+                      Open District Collector Telemetry Feed
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="max-w-7xl mx-auto px-gutter pt-space-md pb-space-xl w-full">
+          <div class="relative rounded-2xl bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-low p-space-xl overflow-hidden shadow-2xl flex flex-col md:flex-row items-center justify-between gap-space-lg">
+            <div class="flex flex-col gap-2 max-w-xl z-10">
+              <div class="inline-flex items-center gap-2 text-primary font-label-caps text-label-caps uppercase tracking-wider">
+                <span class="material-symbols-outlined text-[16px]">domain_verification</span>
+                State &amp; District Administration Portal
+              </div>
+              <h3 class="font-headline-lg text-headline-lg text-text-primary font-bold">
+                Deploy JalSanjeevani in Your District
+              </h3>
+              <p class="font-body-md text-body-md text-text-secondary">
+                Integrate municipal tankers, village cistern sensors, and Copernicus satellite data streams to automate drought disaster response governance.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-space-sm z-10">
+              <a class="px-6 py-3.5 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-semibold shadow-md hover:bg-tertiary-container hover:text-on-tertiary-container transition-all" data-path="login" href="login.html">
+                Access Command Terminal
+              </a>
+              <a class="px-6 py-3.5 rounded-lg bg-surface-container-high text-on-surface hover:text-text-primary font-headline-sm text-headline-sm font-semibold transition-all" data-path="impact" href="#">
+                View Audit Log
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <!-- Pillar 2 -->
-      <div class="pillar-card glass-panel">
-        <span class="pillar-icon">🔒</span>
-        <h3 data-i18n="pillar2_title">Anti-Diversion & Proof-of-Delivery</h3>
-        <p data-i18n="pillar2_desc">Eliminate the Tanker Mafia. A dual-key offline-first cryptographic QR handshake at geofenced community cisterns ensures water is delivered to the people, not sold to private commercial entities.</p>
-      </div>
-
-      <!-- Pillar 3 -->
-      <div class="pillar-card glass-panel">
-        <span class="pillar-icon">🔀</span>
-        <h3 data-i18n="pillar3_title">Multi-Objective Logistics Solver</h3>
-        <p data-i18n="pillar3_desc">Mathematical fair-share distribution routing using Google OR-Tools. Guarantees a minimum statutory quota of 40L/day for humans and 70L/day for cattle, minimizing diesel burn and eliminating skipped hamlets.</p>
-      </div>
-
     </div>
-  </section>
-
-  <!-- Language translation script -->
+  </main>
+  <footer class="w-full bg-surface-container-lowest text-on-surface-variant mt-space-2xl">
+    <div class="max-w-7xl mx-auto px-gutter py-space-xl flex flex-col gap-space-xl">
+      <div class="p-space-lg rounded-xl bg-surface-container-low/70 flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-surface-container-high text-primary-container">
+            <span class="material-symbols-outlined text-[24px]">water_drop</span>
+          </div>
+          <div>
+            <span class="font-label-caps text-label-caps text-text-muted uppercase tracking-wider block">National Emergency Quota Reference Standard</span>
+            <h4 class="font-headline-sm text-headline-sm text-text-primary mt-0.5">Operational Sovereign Mandates</h4>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-space-lg">
+          <div class="flex items-baseline gap-2">
+            <span class="font-telemetry-metric-lg text-telemetry-metric-lg text-primary">40L</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">/ person / day (Human Minimum)</span>
+          </div>
+          <div class="hidden md:block w-px h-8 bg-surface-container-high"></div>
+          <div class="flex items-baseline gap-2">
+            <span class="font-telemetry-metric-lg text-telemetry-metric-lg text-secondary">70L</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">/ head / day (Livestock Sustenance)</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-space-lg">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <img alt="JalSanjeevani Logo" class="h-8 w-auto object-contain rounded-md" src="assets/logo.jpg"/>
+            <span class="font-headline-sm text-headline-sm text-text-primary">JalSanjeevani</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-text-secondary leading-relaxed">Sovereign water logistics architecture, precision drought response forecasting, and cryptographic tanker distribution governance.</p>
+        </div>
+        <div>
+          <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider block mb-3">Navigation</span>
+          <ul class="space-y-2 font-body-sm text-body-sm">
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="landing" href="#">Mission Overview</a></li>
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="technology" href="#">Satellite Integration</a></li>
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="telemetry-live" href="#">Hydrological Telemetry</a></li>
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="impact" href="#">Audit &amp; Transparency</a></li>
+          </ul>
+        </div>
+        <div>
+          <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider block mb-3">Institutional Governance</span>
+          <ul class="space-y-2 font-body-sm text-body-sm">
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="pillars" href="#">State Water Protocols</a></li>
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="dashboard-overview" href="dashboard.html">Civil Supply Verification</a></li>
+            <li data-active-classes="text-primary"><a class="hover:text-on-surface transition-colors" data-path="login" href="login.html">Collectorate Terminal</a></li>
+          </ul>
+        </div>
+        <div>
+          <span class="font-label-caps text-label-caps text-text-primary uppercase tracking-wider block mb-3">Institutional Partnerships</span>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded bg-surface-container font-label-caps text-label-caps text-on-surface-variant">Central Ground Water Board</span>
+            <span class="px-2.5 py-1 rounded bg-surface-container font-label-caps text-label-caps text-on-surface-variant">Copernicus Sentinel</span>
+            <span class="px-2.5 py-1 rounded bg-surface-container font-label-caps text-label-caps text-on-surface-variant">Dept. of Water Resources</span>
+            <span class="px-2.5 py-1 rounded bg-surface-container font-label-caps text-label-caps text-on-surface-variant">Disaster Management Auth</span>
+          </div>
+        </div>
+      </div>
+      <div class="pt-space-md flex flex-col md:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-text-muted">
+        <p>© 2025 JalSanjeevani Grid. Government of India &amp; Civil Society Consortium. All telemetry cryptographically signed.</p>
+        <div class="flex items-center gap-space-md">
+          <span class="flex items-center gap-1.5 font-label-caps text-label-caps">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-telemetry-emerald"></span>ISO 27001 Certified Infrastructure
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
   <script src="js/lang.js"></script>
 </body>
 </html>
