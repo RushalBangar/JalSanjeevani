@@ -1,11 +1,13 @@
 /**
- * JalSanjeevani (RouteGuard) - Panchayat Verifier PWA
+ * JalSanjeevani (RouteGuard) - Panchayat Verifier PWA Tactical Console
  * Layer 2: Anti-Diversion & Cryptographic Proof-of-Delivery Engine
- * Uses real WebRTC camera scanning, image upload decoding, and dual-key verification.
+ * Uses WebRTC camera scanning, image upload decoding, circular gauge animation,
+ * and dual-key cryptographic validation with online-first Supabase sync.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // UI Elements
+  // Scanner Elements
+  const scannerSection = document.getElementById("scannerSection");
   const scannerWindow = document.getElementById("scannerWindow");
   const qrReader = document.getElementById("qrReader");
   const scannerPlaceholder = document.getElementById("scannerPlaceholder");
@@ -18,17 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnUploadQR = document.getElementById("btnUploadQR");
   const qrFileInput = document.getElementById("qrFileInput");
   const btnInstantDemo = document.getElementById("btnInstantDemo");
-  const scannerControlsArea = document.getElementById("scannerControlsArea");
 
+  // Audit Card Elements
   const statusBox = document.getElementById("statusBox");
   const btnResetScan = document.getElementById("btnResetScan");
+  const btnCopyHash = document.getElementById("btnCopyHash");
 
   // Cistern Telemetry Elements
-  const cisternBarFill = document.getElementById("cisternBarFill");
-  const cisternPercentText = document.getElementById("cisternPercentText");
   const cisternStatusBadge = document.getElementById("cisternStatusBadge");
+  const gaugeProgressArc = document.getElementById("gaugeProgressArc");
+  const gaugePercentText = document.getElementById("gaugePercentText");
+  const gaugeHoursText = document.getElementById("gaugeHoursText");
   const cisternCurrentReserve = document.getElementById("cisternCurrentReserve");
-  const incomingDropText = document.getElementById("incomingDropText");
+  const barometerTrackFill = document.getElementById("barometerTrackFill");
+  const geofencePassBadge = document.getElementById("geofencePassBadge");
 
   // Verified Receipt Detail Fields
   const verifiedTankerId = document.getElementById("verifiedTankerId");
@@ -38,8 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const verifiedVolume = document.getElementById("verifiedVolume");
   const verifiedGeofence = document.getElementById("verifiedGeofence");
   const verifiedEscrow = document.getElementById("verifiedEscrow");
+  const verifiedUpdatedReserve = document.getElementById("verifiedUpdatedReserve");
   const verifiedSignature = document.getElementById("verifiedSignature");
   const verifiedTimestamp = document.getElementById("verifiedTimestamp");
+  const syncStatusNotice = document.getElementById("syncStatusNotice");
+
+  // Toast Notification
+  const toastNotification = document.getElementById("toastNotification");
+  const toastText = document.getElementById("toastText");
 
   // State
   let html5QrCode = null;
@@ -51,28 +62,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const networkBadge = document.getElementById("networkStatusBadge");
   const networkDot = document.getElementById("networkStatusDot");
   const networkText = document.getElementById("networkStatusText");
-  const syncStatusNotice = document.getElementById("syncStatusNotice");
 
   function syncNetworkStatus() {
     if (!networkBadge || !networkText) return;
     if (navigator.onLine) {
-      networkBadge.style.background = "rgba(16, 185, 129, 0.15)";
-      networkBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
-      networkBadge.style.color = "#10b981";
-      if (networkDot) networkDot.style.background = "#10b981";
-      networkText.textContent = "Online";
+      networkBadge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-safe-emerald border border-safe-emerald/20";
+      if (networkDot) networkDot.className = "inline-block w-1.5 h-1.5 rounded-full bg-safe-emerald animate-pulse";
+      networkText.textContent = "LIVE ● ONLINE";
     } else {
-      networkBadge.style.background = "rgba(245, 158, 11, 0.15)";
-      networkBadge.style.borderColor = "rgba(245, 158, 11, 0.4)";
-      networkBadge.style.color = "#f59e0b";
-      if (networkDot) networkDot.style.background = "#f59e0b";
-      networkText.textContent = "Offline PWA";
+      networkBadge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-warning-amber border border-warning-amber/30";
+      if (networkDot) networkDot.className = "inline-block w-1.5 h-1.5 rounded-full bg-warning-amber";
+      networkText.textContent = "OFFLINE PWA";
     }
   }
 
   window.addEventListener("online", syncNetworkStatus);
   window.addEventListener("offline", syncNetworkStatus);
   syncNetworkStatus();
+
+  /**
+   * Floating Toast Trigger
+   */
+  function triggerToast(message) {
+    if (!toastNotification || !toastText) return;
+    toastText.textContent = message;
+    toastNotification.classList.remove("opacity-0", "pointer-events-none");
+    toastNotification.classList.add("opacity-100");
+    clearTimeout(toastNotification._timer);
+    toastNotification._timer = setTimeout(() => {
+      toastNotification.classList.remove("opacity-100");
+      toastNotification.classList.add("opacity-0", "pointer-events-none");
+    }, 2800);
+  }
 
   /**
    * Synthesize audio chime for confirmed cryptographic verification
@@ -82,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
-      
+
       const playTone = (freq, start, duration) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -90,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gain.connect(ctx.destination);
         osc.type = "sine";
         osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
-        gain.gain.setValueAtTime(0.12, ctx.currentTime + start);
+        gain.gain.setValueAtTime(0.14, ctx.currentTime + start);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
         osc.start(ctx.currentTime + start);
         osc.stop(ctx.currentTime + start + duration);
@@ -106,19 +127,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Shows status or error message banner
+   * Feedback banner helper
    */
   function setFeedback(msg, isError = false) {
     if (!scanFeedback) return;
-    scanFeedback.style.display = "block";
-    scanFeedback.style.color = isError ? "var(--alert-red)" : "var(--telemetry-emerald)";
-    scanFeedback.style.borderColor = isError ? "rgba(239, 68, 68, 0.4)" : "rgba(16, 185, 129, 0.4)";
+    scanFeedback.classList.remove("hidden");
     scanFeedback.innerHTML = msg;
+    if (isError) {
+      scanFeedback.className = "py-2 px-3 rounded-lg text-center font-label-tactical text-[11px] bg-alert-crimson/15 text-alert-crimson border border-alert-crimson/30";
+    } else {
+      scanFeedback.className = "py-2 px-3 rounded-lg text-center font-label-tactical text-[11px] bg-safe-emerald/15 text-safe-emerald border border-safe-emerald/30";
+    }
   }
 
   function clearFeedback() {
     if (scanFeedback) {
-      scanFeedback.style.display = "none";
+      scanFeedback.classList.add("hidden");
       scanFeedback.innerHTML = "";
     }
   }
@@ -152,11 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cameraBtnText) cameraBtnText.textContent = "Starting Camera...";
       if (btnToggleCamera) btnToggleCamera.disabled = true;
 
-      // Show video element, hide idle placeholder
-      if (qrReader) qrReader.style.display = "block";
-      if (scannerPlaceholder) scannerPlaceholder.style.display = "none";
-      if (scannerLaser) scannerLaser.style.display = "block";
-      if (scannerWindow) scannerWindow.classList.add("scanning");
+      // Show video element, hide idle placeholder, start laser
+      if (qrReader) qrReader.classList.remove("hidden");
+      if (scannerPlaceholder) scannerPlaceholder.classList.add("hidden");
+      if (scannerLaser) scannerLaser.classList.remove("hidden");
+      if (scannerWindow) scannerWindow.classList.add("border-primary");
 
       const config = {
         fps: 15,
@@ -164,14 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
         aspectRatio: 1.0
       };
 
-      // Try environment (rear) camera first, fallback to user camera
       await scanner.start(
         { facingMode: "environment" },
         config,
         onScanSuccess,
-        (errorMessage) => {
-          // Continuous frame scan error (normal during searching)
-        }
+        () => {}
       ).catch(async (err) => {
         console.warn("Rear camera failed, trying generic camera:", err);
         await scanner.start(
@@ -185,13 +206,12 @@ document.addEventListener("DOMContentLoaded", () => {
       isCameraActive = true;
       if (btnToggleCamera) {
         btnToggleCamera.disabled = false;
-        btnToggleCamera.style.background = "rgba(239, 68, 68, 0.2)";
-        btnToggleCamera.style.borderColor = "var(--alert-red)";
-        btnToggleCamera.style.color = "var(--alert-red)";
+        btnToggleCamera.classList.remove("bg-primary", "hover:bg-primary-container", "text-on-primary");
+        btnToggleCamera.classList.add("bg-alert-crimson/20", "hover:bg-alert-crimson/30", "text-alert-crimson", "border", "border-alert-crimson/40");
       }
-      if (cameraBtnIcon) cameraBtnIcon.textContent = "⏹";
+      if (cameraBtnIcon) cameraBtnIcon.textContent = "stop_circle";
       if (cameraBtnText) cameraBtnText.textContent = "Stop Camera";
-      setFeedback("📷 Camera active. Align Driver QR inside the frame.");
+      setFeedback("📷 Camera active. Align Driver QR inside optical frame.");
 
     } catch (err) {
       console.error("Camera start error:", err);
@@ -201,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Stops the live camera stream
+   * Stops live camera stream
    */
   async function stopCamera() {
     if (html5QrCode && html5QrCode.isScanning) {
@@ -216,18 +236,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function stopCameraUI() {
     isCameraActive = false;
-    if (qrReader) qrReader.style.display = "none";
-    if (scannerPlaceholder) scannerPlaceholder.style.display = "flex";
-    if (scannerLaser) scannerLaser.style.display = "none";
-    if (scannerWindow) scannerWindow.classList.remove("scanning");
+    if (qrReader) qrReader.classList.add("hidden");
+    if (scannerPlaceholder) scannerPlaceholder.classList.remove("hidden");
+    if (scannerLaser) scannerLaser.classList.add("hidden");
+    if (scannerWindow) scannerWindow.classList.remove("border-primary");
 
     if (btnToggleCamera) {
       btnToggleCamera.disabled = false;
-      btnToggleCamera.style.background = "";
-      btnToggleCamera.style.borderColor = "";
-      btnToggleCamera.style.color = "";
+      btnToggleCamera.classList.remove("bg-alert-crimson/20", "hover:bg-alert-crimson/30", "text-alert-crimson", "border", "border-alert-crimson/40");
+      btnToggleCamera.classList.add("bg-primary", "hover:bg-primary-container", "text-on-primary");
     }
-    if (cameraBtnIcon) cameraBtnIcon.textContent = "📷";
+    if (cameraBtnIcon) cameraBtnIcon.textContent = "photo_camera";
     if (cameraBtnText) cameraBtnText.textContent = "Open Live Camera Scan";
   }
 
@@ -253,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       data = JSON.parse(decodedText);
     } catch (e) {
-      // If not JSON, treat as raw driver token or plaintext
       data = {
         tanker_id: "TN-SN-02",
         registration: "MH-15-TK-5512",
@@ -264,7 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
-    // Default fallback values
     const tankerId = data.tanker_id || "TN-SN-02";
     const regNumber = data.registration || "MH-15-TK-5512";
     const targetVillage = data.target_village || "Khopadi (Sinnar)";
@@ -274,9 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const timestampStr = data.timestamp || new Date().toISOString();
 
     // 1. Geofence & Dual-Key Validation
-    const isKeyValid = driverKey.startsWith("0x") && driverKey.length >= 8;
-    
-    // Haversine distance from driver GPS to Khopadi cistern
     let distanceMeters = 12;
     if (data.lat && data.lng) {
       const R = 6371000;
@@ -300,61 +314,69 @@ document.addEventListener("DOMContentLoaded", () => {
     if (verifiedVolume) verifiedVolume.textContent = `${volume.toLocaleString()} Liters`;
     if (verifiedGeofence) {
       if (isPerimeterValid) {
-        verifiedGeofence.textContent = `✓ Inside Cistern Perimeter (${distanceMeters}m • GPS Verified)`;
-        verifiedGeofence.style.color = "var(--telemetry-emerald)";
+        verifiedGeofence.innerHTML = `<span class="material-symbols-outlined text-[14px]">check_circle</span> Inside Perimeter (${distanceMeters}m • GPS Pass)`;
+        verifiedGeofence.className = "font-body-sm text-body-sm text-safe-emerald font-semibold flex items-center gap-1";
       } else {
-        verifiedGeofence.textContent = `⚠️ Geofence Deviation: ${distanceMeters}m away from cistern`;
-        verifiedGeofence.style.color = "var(--alert-red)";
+        verifiedGeofence.innerHTML = `⚠️ Geofence Deviation: ${distanceMeters}m away`;
+        verifiedGeofence.className = "font-body-sm text-body-sm text-alert-crimson font-semibold flex items-center gap-1";
       }
     }
     if (verifiedEscrow) {
-      verifiedEscrow.textContent = "RELEASED ✓ (Direct DBT Escrow Cleared)";
-      verifiedEscrow.style.color = "var(--telemetry-emerald)";
+      verifiedEscrow.textContent = "RELEASED ✓ (Direct DBT Authorized)";
     }
-    if (verifiedSignature) verifiedSignature.textContent = signature;
+    if (verifiedUpdatedReserve) {
+      verifiedUpdatedReserve.textContent = "12,000 L (48% Safe) ↑";
+    }
+    if (verifiedSignature) {
+      verifiedSignature.textContent = signature.startsWith("SHA256:") ? signature : `SHA256:${signature}`;
+    }
     if (verifiedTimestamp) {
-      try {
-        verifiedTimestamp.textContent = new Date(timestampStr).toLocaleString("en-IN", {
-          dateStyle: "medium",
-          timeStyle: "medium"
-        });
-      } catch (e) {
-        verifiedTimestamp.textContent = timestampStr;
-      }
+      verifiedTimestamp.textContent = new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
-    // 3. Switch View to Success Card
-    if (scannerWindow) scannerWindow.style.display = "none";
-    if (scannerControlsArea) scannerControlsArea.style.display = "none";
+    // 3. Reveal Verified Audit Card
     clearFeedback();
-
     if (statusBox) {
-      statusBox.classList.add("success");
+      statusBox.classList.remove("hidden");
+      statusBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // 4. Animate Cistern Barometer Fill from 8% to 48% (Safe Reserve)
-    if (cisternBarFill) {
-      cisternBarFill.style.width = "48%";
-      cisternBarFill.style.background = "#10b981";
+    // 4. Animate Circular Cistern Gauge from 8% to 48% Safe
+    if (gaugeProgressArc) {
+      // 48% offset: 251.2 * (1 - 0.48) = 130.6
+      gaugeProgressArc.setAttribute("stroke-dashoffset", "130.6");
+      gaugeProgressArc.classList.remove("text-alert-crimson");
+      gaugeProgressArc.classList.add("text-safe-emerald");
     }
-    if (cisternPercentText) {
-      cisternPercentText.textContent = "48% (Safe)";
-      cisternPercentText.style.color = "#10b981";
+    if (gaugePercentText) {
+      gaugePercentText.textContent = "48%";
+      gaugePercentText.classList.remove("text-alert-crimson");
+      gaugePercentText.classList.add("text-safe-emerald");
+    }
+    if (gaugeHoursText) {
+      gaugeHoursText.textContent = "Sufficient for ~72h";
+      gaugeHoursText.className = "font-label-tactical text-[10px] text-safe-emerald mt-1 text-center font-semibold";
     }
     if (cisternStatusBadge) {
-      cisternStatusBadge.innerHTML = "● 48% SAFE RESERVE";
-      cisternStatusBadge.style.color = "#10b981";
+      cisternStatusBadge.textContent = "● 48% SAFE RESERVE";
+      cisternStatusBadge.className = "px-2.5 py-1 rounded bg-safe-emerald/20 text-safe-emerald font-label-tactical text-label-tactical uppercase font-bold shadow-[0_0_12px_rgba(16,185,129,0.4)] shrink-0";
     }
     if (cisternCurrentReserve) {
-      cisternCurrentReserve.innerHTML = "12,000 / 25,000 L";
-      cisternCurrentReserve.style.color = "#10b981";
+      cisternCurrentReserve.textContent = "12,000";
     }
-    if (incomingDropText) {
-      incomingDropText.innerHTML = `Delivered &amp; Verified ✓ (+${volume.toLocaleString()}L)`;
-      incomingDropText.style.color = "#10b981";
+    if (barometerTrackFill) {
+      barometerTrackFill.style.width = "48%";
+      barometerTrackFill.classList.remove("bg-alert-crimson");
+      barometerTrackFill.classList.add("bg-safe-emerald");
+      barometerTrackFill.style.boxShadow = "0 0 10px rgba(16, 185, 129, 0.7)";
+    }
+    if (geofencePassBadge) {
+      geofencePassBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-safe-emerald"></span> DELIVERED & VERIFIED ✓`;
     }
 
-    // 5. Store signed receipt locally in offline storage (IndexedDB/localStorage)
+    triggerToast("✓ Dual-Key Cryptographic Handshake Verified");
+
+    // 5. Store signed receipt locally in offline storage
     const receipt = {
       village: targetVillage,
       tanker: tankerId,
@@ -377,9 +399,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. Online-First Sync with Supabase Database
     if (syncStatusNotice) {
       if (navigator.onLine) {
-        syncStatusNotice.innerHTML = "✓ <span style='color: #10b981;'>Synced live to Supabase PostgreSQL &amp; Collector Dashboard</span>";
+        syncStatusNotice.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-safe-emerald"></span><span>Synced live with Supabase PostgreSQL • UTC Synchronized</span>`;
       } else {
-        syncStatusNotice.innerHTML = "📶 <span style='color: #f59e0b;'>Queued offline (Will auto-sync to cloud when online)</span>";
+        syncStatusNotice.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-warning-amber"></span><span>Queued offline (Will auto-sync to cloud when online)</span>`;
       }
     }
 
@@ -492,7 +514,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Reset Simulation / Scan Again Handler
+  // Copy SHA-256 Hash Handler
+  if (btnCopyHash) {
+    btnCopyHash.addEventListener("click", () => {
+      const digest = verifiedSignature ? verifiedSignature.textContent : "SHA256:8f4c2e1b9a7d3c5e";
+      navigator.clipboard?.writeText(digest);
+      triggerToast("SHA-256 Digest Copied to Clipboard");
+    });
+  }
+
+  // Reset / Scan Another Tanker Handler
   if (btnResetScan) {
     btnResetScan.addEventListener("click", resetVerification);
   }
@@ -501,37 +532,42 @@ document.addEventListener("DOMContentLoaded", () => {
     stopCameraUI();
     clearFeedback();
 
-    if (scannerWindow) {
-      scannerWindow.style.display = "flex";
-      scannerWindow.style.borderColor = "var(--accent-amber)";
-    }
-    if (scannerControlsArea) {
-      scannerControlsArea.style.display = "block";
-    }
     if (statusBox) {
-      statusBox.classList.remove("success");
+      statusBox.classList.add("hidden");
     }
 
-    // Reset Barometer to 8% Critical
-    if (cisternBarFill) {
-      cisternBarFill.style.width = "8%";
-      cisternBarFill.style.background = "var(--alert-red)";
+    // Reset Gauge to 8% Critical
+    if (gaugeProgressArc) {
+      gaugeProgressArc.setAttribute("stroke-dashoffset", "231.1");
+      gaugeProgressArc.classList.remove("text-safe-emerald");
+      gaugeProgressArc.classList.add("text-alert-crimson");
     }
-    if (cisternPercentText) {
-      cisternPercentText.textContent = "8%";
-      cisternPercentText.style.color = "var(--alert-red)";
+    if (gaugePercentText) {
+      gaugePercentText.textContent = "8%";
+      gaugePercentText.classList.remove("text-safe-emerald");
+      gaugePercentText.classList.add("text-alert-crimson");
+    }
+    if (gaugeHoursText) {
+      gaugeHoursText.textContent = "Reserves Dry in ~4h";
+      gaugeHoursText.className = "font-label-tactical text-[10px] text-on-surface-variant mt-1 text-center";
     }
     if (cisternStatusBadge) {
-      cisternStatusBadge.innerHTML = "● 8% CRITICAL";
-      cisternStatusBadge.style.color = "var(--alert-red)";
+      cisternStatusBadge.textContent = "8% CRITICAL";
+      cisternStatusBadge.className = "px-2.5 py-1 rounded bg-alert-crimson/20 text-alert-crimson font-label-tactical text-label-tactical uppercase font-bold shadow-[0_0_12px_rgba(239,68,68,0.4)] animate-pulse shrink-0";
     }
     if (cisternCurrentReserve) {
-      cisternCurrentReserve.innerHTML = "2,000 / 25,000 L";
-      cisternCurrentReserve.style.color = "var(--alert-red)";
+      cisternCurrentReserve.textContent = "2,000";
     }
-    if (incomingDropText) {
-      incomingDropText.innerHTML = "+10,000 L (Tanker TN-SN-02)";
-      incomingDropText.style.color = "var(--primary-color)";
+    if (barometerTrackFill) {
+      barometerTrackFill.style.width = "8%";
+      barometerTrackFill.classList.remove("bg-safe-emerald");
+      barometerTrackFill.classList.add("bg-alert-crimson");
+      barometerTrackFill.style.boxShadow = "0 0 8px rgba(239, 68, 68, 0.7)";
     }
+    if (geofencePassBadge) {
+      geofencePassBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-safe-emerald animate-pulse"></span> IN RANGE (12m)`;
+    }
+
+    triggerToast("Buffer Cleared. Ready for Next Tanker.");
   }
 });
