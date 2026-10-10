@@ -1,6 +1,10 @@
 /**
  * JalSanjeevani (RouteGuard) - Supabase Client & Realtime Layer
- * Connects the frontend to Supabase PostgreSQL & Realtime Websockets.
+ * Strategy: Online-First with Offline Queue and Automatic Background Synchronization.
+ *
+ * 1. Online-First: Connects directly to Supabase PostgreSQL & Realtime Websockets.
+ * 2. Offline Queue: If connectivity is lost, writes actions to local storage queue.
+ * 3. Auto-Sync: Automatically flushes pending queue when internet connection returns.
  */
 
 const SUPABASE_CONFIG = {
@@ -13,7 +17,9 @@ class JalSanjeevaniSupabase {
     this.client = null;
     this.isConnected = false;
     this.subscriptions = [];
+    this.offlineQueueKey = "jalsanjeevani_offline_sync_queue";
     this.init();
+    this.setupOnlineSyncListener();
   }
 
   init() {
@@ -21,12 +27,81 @@ class JalSanjeevaniSupabase {
       try {
         this.client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         this.isConnected = true;
-        console.log("🌊 [JalSanjeevani] Supabase client initialized successfully.");
+        console.log("🌊 [JalSanjeevani] Online Supabase client initialized successfully.");
       } catch (err) {
         console.error("🌊 [JalSanjeevani] Supabase init failed:", err);
       }
     } else {
       console.warn("🌊 [JalSanjeevani] Supabase SDK script not found on page.");
+    }
+  }
+
+  /**
+   * Listen for network reconnection to flush offline queue
+   */
+  setupOnlineSyncListener() {
+    window.addEventListener("online", () => {
+      console.log("📶 [JalSanjeevani] Internet reconnected! Auto-syncing pending offline queue...");
+      this.flushOfflineQueue();
+    });
+
+    // Also attempt flush on startup if online
+    if (navigator.onLine) {
+      setTimeout(() => this.flushOfflineQueue(), 2000);
+    }
+  }
+
+  /**
+   * Queue an action to local storage when offline
+   */
+  queueOfflineAction(type, payload) {
+    try {
+      const queue = JSON.parse(localStorage.getItem(this.offlineQueueKey) || "[]");
+      queue.push({ type, payload, queued_at: new Date().toISOString() });
+      localStorage.setItem(this.offlineQueueKey, JSON.stringify(queue));
+      console.log(`📶 [Offline Queue] Queued ${type} action. Total queued: ${queue.length}`);
+    } catch (e) {
+      console.warn("Failed to queue offline action:", e);
+    }
+  }
+
+  /**
+   * Flush all pending offline actions to Supabase when back online
+   */
+  async flushOfflineQueue() {
+    if (!navigator.onLine || !this.client) return;
+
+    try {
+      const queue = JSON.parse(localStorage.getItem(this.offlineQueueKey) || "[]");
+      if (!queue.length) return;
+
+      console.log(`📶 Flushing ${queue.length} pending items to Supabase...`);
+      const remaining = [];
+
+      for (const item of queue) {
+        try {
+          if (item.type === "receipt") {
+            await this.client.from("delivery_receipts").insert([item.payload]);
+            console.log("✓ Offline receipt synced to Supabase:", item.payload.tanker);
+          } else if (item.type === "tanker_location") {
+            await this.client.from("tankers").update(item.payload.data).eq("id", item.payload.id);
+            console.log("✓ Offline tanker location synced:", item.payload.id);
+          } else if (item.type === "village_update") {
+            await this.client.from("villages").update(item.payload.data).or(item.payload.filter);
+            console.log("✓ Offline village update synced.");
+          }
+        } catch (err) {
+          console.warn("Could not sync item, keeping in queue:", err);
+          remaining.push(item);
+        }
+      }
+
+      localStorage.setItem(this.offlineQueueKey, JSON.stringify(remaining));
+      if (remaining.length === 0) {
+        console.log("📶 All offline items successfully synchronized with Supabase!");
+      }
+    } catch (e) {
+      console.warn("Offline queue flush error:", e);
     }
   }
 
@@ -51,69 +126,89 @@ class JalSanjeevaniSupabase {
   }
 
   /**
-   * Fetch all villages from Supabase
+   * Fetch all villages from Supabase (Online-first with local fallback)
    */
   async getVillages() {
-    if (!this.client) return null;
-    try {
-      const { data, error } = await this.client
-        .from('villages')
-        .select('*')
-        .order('id', { ascending: true });
-      if (error) {
-        console.warn("Supabase fetch villages error:", error.message);
-        return null;
+    if (this.client && navigator.onLine) {
+      try {
+        const { data, error } = await this.client
+          .from('villages')
+          .select('*')
+          .order('id', { ascending: true });
+        if (!error && data) {
+          // Cache locally for offline fallback
+          try { localStorage.setItem('jalsanjeevani_villages_cache', JSON.stringify(data)); } catch (e) {}
+          return data;
+        }
+      } catch (e) {
+        console.warn("Supabase getVillages online fetch failed, using fallback:", e);
       }
-      return data;
-    } catch (e) {
-      console.warn("Supabase getVillages failed:", e);
-      return null;
     }
+
+    // Offline fallback from local storage cache
+    try {
+      const cached = localStorage.getItem('jalsanjeevani_villages_cache');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
   }
 
   /**
-   * Fetch all tankers from Supabase
+   * Fetch all tankers from Supabase (Online-first with local fallback)
    */
   async getTankers() {
-    if (!this.client) return null;
-    try {
-      const { data, error } = await this.client
-        .from('tankers')
-        .select('*')
-        .order('id', { ascending: true });
-      if (error) {
-        console.warn("Supabase fetch tankers error:", error.message);
-        return null;
+    if (this.client && navigator.onLine) {
+      try {
+        const { data, error } = await this.client
+          .from('tankers')
+          .select('*')
+          .order('id', { ascending: true });
+        if (!error && data) {
+          try { localStorage.setItem('jalsanjeevani_tankers_cache', JSON.stringify(data)); } catch (e) {}
+          return data;
+        }
+      } catch (e) {
+        console.warn("Supabase getTankers online fetch failed, using fallback:", e);
       }
-      return data;
-    } catch (e) {
-      console.warn("Supabase getTankers failed:", e);
-      return null;
     }
+
+    // Offline fallback
+    try {
+      const cached = localStorage.getItem('jalsanjeevani_tankers_cache');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
   }
 
   /**
-   * Update Tanker GPS coordinates and telemetry status
+   * Update Tanker GPS coordinates (Online-First with Offline Queue)
    */
   async updateTankerLocation(tankerId, lat, lng, isRogue = false, status = "active") {
-    if (!this.client) return false;
-    try {
-      const { data, error } = await this.client
-        .from('tankers')
-        .update({
-          lat: lat,
-          lng: lng,
-          is_rogue: isRogue,
-          status: status,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', tankerId);
-      if (error) throw error;
-      return true;
-    } catch (err) {
-      console.error(`Failed to update tanker ${tankerId}:`, err);
-      return false;
+    const updateData = {
+      lat: lat,
+      lng: lng,
+      is_rogue: isRogue,
+      status: status,
+      updated_at: new Date().toISOString()
+    };
+
+    // 1. ONLINE-FIRST: Attempt direct update
+    if (this.client && navigator.onLine) {
+      try {
+        const { data, error } = await this.client
+          .from('tankers')
+          .update(updateData)
+          .eq('id', tankerId);
+        if (!error) return true;
+        console.warn("Supabase updateTankerLocation error, queueing offline:", error);
+      } catch (err) {
+        console.warn("Network error during updateTankerLocation, queueing offline:", err);
+      }
     }
+
+    // 2. OFFLINE FALLBACK: Queue update
+    this.queueOfflineAction("tanker_location", { id: tankerId, data: updateData });
+    return true;
   }
 
   /**
@@ -140,30 +235,39 @@ class JalSanjeevaniSupabase {
   }
 
   /**
-   * Save Cryptographic Delivery Receipt from Panchayat QR scan
+   * Save Cryptographic Delivery Receipt from Panchayat QR scan (Online-First with Offline Queue)
    */
   async saveDeliveryReceipt(receipt) {
-    if (!this.client) return null;
-    try {
-      const { data, error } = await this.client
-        .from('delivery_receipts')
-        .insert([{
-          village: receipt.village,
-          tanker: receipt.tanker,
-          volume_liters: receipt.volume || 10000,
-          driver_key: receipt.driver_key,
-          cistern_key: receipt.cistern_key,
-          signature: receipt.signature || 'SHA256:8f4c2e1b9a7d3c5e',
-          status: receipt.status || 'VERIFIED_DELIVERED'
-        }])
-        .select();
-      if (error) throw error;
-      console.log("🌊 Delivery receipt saved to Supabase:", data);
-      return data;
-    } catch (err) {
-      console.error("Failed to save delivery receipt in Supabase:", err);
-      return null;
+    const payload = {
+      village: receipt.village,
+      tanker: receipt.tanker,
+      volume_liters: receipt.volume || 10000,
+      driver_key: receipt.driver_key,
+      cistern_key: receipt.cistern_key,
+      signature: receipt.signature || 'SHA256:8f4c2e1b9a7d3c5e',
+      status: receipt.status || 'VERIFIED_DELIVERED'
+    };
+
+    // 1. ONLINE-FIRST: Send to Supabase PostgreSQL immediately
+    if (this.client && navigator.onLine) {
+      try {
+        const { data, error } = await this.client
+          .from('delivery_receipts')
+          .insert([payload])
+          .select();
+        if (!error) {
+          console.log("🌊 [Online-First] Delivery receipt saved to Supabase:", data);
+          return { online: true, data };
+        }
+        console.warn("Supabase insert error, falling back to offline queue:", error);
+      } catch (err) {
+        console.warn("Network error inserting receipt, queueing offline:", err);
+      }
     }
+
+    // 2. OFFLINE FALLBACK: Queue for automatic background sync when reconnected
+    this.queueOfflineAction("receipt", payload);
+    return { online: false, queued: true, payload };
   }
 
   /**

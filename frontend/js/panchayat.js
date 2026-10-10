@@ -47,6 +47,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const CISTERN_GEOKEY = "0x74CE8A1109B2"; // Khopadi Statutory Cistern Key
   const KHOPADI_COORDS = { lat: 19.9015, lng: 74.1030 };
 
+  // Online-First Network Status Sync
+  const networkBadge = document.getElementById("networkStatusBadge");
+  const networkDot = document.getElementById("networkStatusDot");
+  const networkText = document.getElementById("networkStatusText");
+  const syncStatusNotice = document.getElementById("syncStatusNotice");
+
+  function syncNetworkStatus() {
+    if (!networkBadge || !networkText) return;
+    if (navigator.onLine) {
+      networkBadge.style.background = "rgba(16, 185, 129, 0.15)";
+      networkBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+      networkBadge.style.color = "#10b981";
+      if (networkDot) networkDot.style.background = "#10b981";
+      networkText.textContent = "Online";
+    } else {
+      networkBadge.style.background = "rgba(245, 158, 11, 0.15)";
+      networkBadge.style.borderColor = "rgba(245, 158, 11, 0.4)";
+      networkBadge.style.color = "#f59e0b";
+      if (networkDot) networkDot.style.background = "#f59e0b";
+      networkText.textContent = "Offline PWA";
+    }
+  }
+
+  window.addEventListener("online", syncNetworkStatus);
+  window.addEventListener("offline", syncNetworkStatus);
+  syncNetworkStatus();
+
   /**
    * Synthesize audio chime for confirmed cryptographic verification
    */
@@ -347,7 +374,15 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("Local storage write error:", e);
     }
 
-    // 6. Sync with Supabase Database
+    // 6. Online-First Sync with Supabase Database
+    if (syncStatusNotice) {
+      if (navigator.onLine) {
+        syncStatusNotice.innerHTML = "✓ <span style='color: #10b981;'>Synced live to Supabase PostgreSQL &amp; Collector Dashboard</span>";
+      } else {
+        syncStatusNotice.innerHTML = "📶 <span style='color: #f59e0b;'>Queued offline (Will auto-sync to cloud when online)</span>";
+      }
+    }
+
     if (window.JalSupabase) {
       window.JalSupabase.saveDeliveryReceipt(receipt);
       window.JalSupabase.updateTankerLocation(tankerId, KHOPADI_COORDS.lat, KHOPADI_COORDS.lng, false, "delivered");

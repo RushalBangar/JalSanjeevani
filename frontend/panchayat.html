@@ -21,7 +21,11 @@
         <h2 style="font-size: 0.95rem;">Panchayat Verifier</h2>
       </a>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <span id="networkStatusBadge" style="font-size: 0.68rem; padding: 2px 7px; border-radius: 9999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+        <span id="networkStatusDot" style="width: 5px; height: 5px; border-radius: 50%; background: #10b981;"></span>
+        <span id="networkStatusText">Online</span>
+      </span>
       <select id="langSwitcher" class="lang-select-sm" style="padding: 3px 6px; font-size: 0.75rem;" aria-label="Language Selector">
         <option value="en">EN</option>
         <option value="mr">मराठी</option>
@@ -126,7 +130,7 @@
         <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
           <div>Signature: <span id="verifiedSignature" class="font-mono">SHA256:8f4c2e1b9a7d3c5e</span></div>
           <div>Timestamp: <span id="verifiedTimestamp"></span></div>
-          <div style="margin-top: 2px;">Receipt stored offline &amp; synced with Supabase PostgreSQL</div>
+          <div id="syncStatusNotice" style="margin-top: 2px;">Receipt synced live with Supabase PostgreSQL</div>
         </div>
       </div>
       <button id="btnResetScan" class="btn btn-outline btn-sm" style="margin-top: 12px; width: 100%; font-size: 0.75rem;">

@@ -20,6 +20,32 @@ document.addEventListener("DOMContentLoaded", () => {
   let isArrived = false;
   let qrcodeInstance = null;
 
+  // Online-First Network Status Sync
+  const networkBadge = document.getElementById("networkStatusBadge");
+  const networkDot = document.getElementById("networkStatusDot");
+  const networkText = document.getElementById("networkStatusText");
+
+  function syncNetworkStatus() {
+    if (!networkBadge || !networkText) return;
+    if (navigator.onLine) {
+      networkBadge.style.background = "rgba(16, 185, 129, 0.15)";
+      networkBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+      networkBadge.style.color = "#10b981";
+      if (networkDot) networkDot.style.background = "#10b981";
+      networkText.textContent = "Online";
+    } else {
+      networkBadge.style.background = "rgba(245, 158, 11, 0.15)";
+      networkBadge.style.borderColor = "rgba(245, 158, 11, 0.4)";
+      networkBadge.style.color = "#f59e0b";
+      if (networkDot) networkDot.style.background = "#f59e0b";
+      networkText.textContent = "Offline PWA";
+    }
+  }
+
+  window.addEventListener("online", syncNetworkStatus);
+  window.addEventListener("offline", syncNetworkStatus);
+  syncNetworkStatus();
+
   // Active delivery manifest parameters
   const manifest = {
     protocol: "JALSANJEEVANI_POD_V2",
