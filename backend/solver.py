@@ -109,11 +109,19 @@ def optimize_routes(villages, num_tankers, tanker_capacity, depot_coords=None, d
         'Capacity'
     )
     
-    # Allow dropping visits if demand is too high for the fleet (Penalty)
-    # We assign a huge penalty so it only drops if absolutely physically impossible
-    penalty = 1000000 
+    # Prioritized disjunction penalties:
+    # Critical/Depleted villages have 10,000,000 penalty (must serve first to prevent loss of life/cattle)
+    # Warning villages have 500,000 penalty (deferrable if fleet capacity is constrained)
     for node in range(1, len(data['distance_matrix'])):
-        routing.AddDisjunction([manager.NodeToIndex(node)], penalty)
+        village_obj = villages[node - 1]
+        v_status = str(get_attr(village_obj, 'status', 'normal')).lower()
+        if 'critical' in v_status or 'depleted' in v_status:
+            node_penalty = 10000000
+        elif 'warning' in v_status:
+            node_penalty = 500000
+        else:
+            node_penalty = 100000
+        routing.AddDisjunction([manager.NodeToIndex(node)], node_penalty)
 
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC)
