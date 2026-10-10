@@ -465,35 +465,43 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       let routesDrawn = false;
+      const apiEndpoints = [
+        "https://jalsanjeevani.onrender.com/api/allocate",
+        "http://127.0.0.1:8000/api/allocate"
+      ];
 
-      try {
-        const response = await fetch("http://127.0.0.1:8000/api/allocate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+      for (const endpoint of apiEndpoints) {
+        if (routesDrawn) break;
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data.routes && data.routes.length > 0) {
-            generatedRouteData = data.routes;
-            const colors = ['#00e5ff', '#10b981', '#3491ff'];
-            data.routes.forEach((route, idx) => {
-              const polyCoords = route.map(point => point.coords);
-              const polyline = L.polyline(polyCoords, {
-                color: colors[idx % colors.length],
-                weight: 4,
-                dashArray: '8, 8',
-                lineCap: 'round'
-              }).bindPopup(`<b>OR-Tools Route #${idx + 1}</b><br>Statutory Minimum Fulfilled • 100% Demand Met`).addTo(routeLayer);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.routes && data.routes.length > 0) {
+              generatedRouteData = data.routes;
+              const colors = ['#00e5ff', '#10b981', '#3491ff'];
+              data.routes.forEach((route, idx) => {
+                const polyCoords = route.map(point => point.coords);
+                const polyline = L.polyline(polyCoords, {
+                  color: colors[idx % colors.length],
+                  weight: 4,
+                  dashArray: '8, 8',
+                  lineCap: 'round'
+                }).bindPopup(`<b>OR-Tools Route #${idx + 1}</b><br>Live Cloud Solved • 100% Demand Met`).addTo(routeLayer);
 
-              activePolylines.push(polyline);
-            });
-            routesDrawn = true;
+                activePolylines.push(polyline);
+              });
+              routesDrawn = true;
+              console.log(`🌊 [JalSanjeevani] Successfully optimized routes via ${endpoint}`);
+            }
           }
+        } catch (err) {
+          console.warn(`Backend endpoint ${endpoint} unavailable, trying fallback...`);
         }
-      } catch (err) {
-        console.warn("Backend API offline, executing local OR-Tools route matrix fallback:", err);
       }
 
       // Local fallback routes if backend server is offline or returned empty
