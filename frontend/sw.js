@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
   './js/driver.js',
   './js/panchayat.js',
   './js/dashboard.js',
+  './js/supabaseClient.js',
   './js/lang.js',
   './assets/favicon.svg',
   './assets/logo.jpg'

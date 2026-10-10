@@ -357,6 +357,25 @@ document.addEventListener("DOMContentLoaded", () => {
           renderVillageMarkers();
           renderVillageList();
         }
+      // 5. Realtime listener: Live Delivery QR Verifications
+      window.JalSupabase.subscribeToReceipts((payload) => {
+        const record = payload.new;
+        if (!record) return;
+        console.log("⚡ [Realtime] Live Delivery Verified:", record);
+        
+        // Show live floating alert on Collector Dashboard
+        const toast = document.createElement("div");
+        toast.innerHTML = `
+          <div style="position: fixed; bottom: 24px; right: 24px; background: rgba(7, 14, 26, 0.95); border: 1px solid #10b981; border-left: 4px solid #10b981; padding: 12px 18px; border-radius: 8px; box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25); z-index: 9999; display: flex; align-items: center; gap: 12px; font-family: Inter, sans-serif; backdrop-filter: blur(12px);">
+            <span style="font-size: 1.4rem;">💧</span>
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 700; color: #10b981;">CRYPTOGRAPHIC QR VERIFIED</div>
+              <div style="font-size: 0.75rem; color: #dce2f4;">${record.volume_liters.toLocaleString()}L discharged at ${record.village} by Tanker ${record.tanker}. Escrow released.</div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 6000);
       });
 
     } catch (err) {
