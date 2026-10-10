@@ -12,7 +12,8 @@ from geospatial import (
     calculate_statutory_quota,
     predict_14day_scarcity,
     get_regional_satellite_telemetry,
-    calculate_haversine_distance
+    calculate_haversine_distance,
+    fetch_live_satellite_data
 )
 from security import (
     verify_delivery_handshake,
@@ -124,6 +125,19 @@ def get_satellite_telemetry():
     and CGWB groundwater drop rates for the Sinnar semi-arid disaster corridor.
     """
     return get_regional_satellite_telemetry()
+
+@app.get("/api/satellite/live")
+def get_live_satellite(
+    lat: float = Query(19.0952, description="Latitude (default Ahilyanagar: 19.0952)"),
+    lng: float = Query(74.7496, description="Longitude (default Ahilyanagar: 74.7496)"),
+    district: str = Query("Ahilyanagar", description="District or Taluka name")
+):
+    """
+    Direct Live Satellite API:
+    Returns real-time European Earth Observation & Satellite telemetry
+    for Ahilyanagar or any coordinates directly as structured JSON.
+    """
+    return fetch_live_satellite_data(lat=lat, lng=lng, district_name=district)
 
 @app.post("/api/scarcity/predict")
 def predict_scarcity(req: ScarcityPredictRequest):
