@@ -1,122 +1,416 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tanker Driver Logistics PWA | JalSanjeevani</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_tab" name="shell-type"/>
+  <title>Tanker Driver Cockpit | JalSanjeevani</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/mobile.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "safe-emerald": "#10B981",
+            "on-error": "#690005",
+            "warning-amber": "#F59E0B",
+            "warning-amber-glow": "rgba(245, 158, 11, 0.2)",
+            "on-primary-fixed-variant": "#004e5c",
+            "surface-variant": "#2f3543",
+            "telemetry-cyan-glow": "rgba(6, 182, 212, 0.2)",
+            "inverse-primary": "#00687a",
+            "tertiary-fixed": "#6ffbbe",
+            "on-tertiary-fixed-variant": "#005236",
+            "outline": "#869397",
+            "primary": "#4cd7f6",
+            "border-active": "rgba(6, 182, 212, 0.45)",
+            "surface": "#0d1320",
+            "on-tertiary-fixed": "#002113",
+            "primary-container": "#06b6d4",
+            "surface-container-low": "#161b29",
+            "outline-variant": "#3d494c",
+            "secondary-fixed-dim": "#7bd0ff",
+            "surface-bright": "#333948",
+            "tertiary": "#4edea3",
+            "inverse-surface": "#dde2f5",
+            "surface-overlay": "#1E2C4A",
+            "alert-crimson": "#EF4444",
+            "safe-emerald-glow": "rgba(16, 185, 129, 0.2)",
+            "secondary": "#7bd0ff",
+            "surface-tint": "#4cd7f6",
+            "error-container": "#93000a",
+            "surface-panel": "#111A2E",
+            "on-secondary": "#00354a",
+            "on-surface-variant": "#bcc9cd",
+            "on-primary": "#003640",
+            "tertiary-container": "#1bbd85",
+            "on-primary-container": "#00424f",
+            "primary-fixed-dim": "#4cd7f6",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#4edea3",
+            "surface-dim": "#0d1320",
+            "surface-container": "#1a1f2d",
+            "alert-crimson-glow": "rgba(239, 68, 68, 0.2)",
+            "surface-base": "#0B111E",
+            "surface-container-highest": "#2f3543",
+            "on-secondary-fixed": "#001e2c",
+            "on-tertiary-container": "#00452e",
+            "on-primary-fixed": "#001f26",
+            "on-surface": "#dde2f5",
+            "inverse-on-surface": "#2a303f",
+            "on-secondary-container": "#00374d",
+            "secondary-container": "#00a6e0",
+            "on-background": "#dde2f5",
+            "surface-card": "#17233D",
+            "primary-fixed": "#acedff",
+            "background": "#0d1320",
+            "on-tertiary": "#003824",
+            "error": "#ffb4ab",
+            "surface-container-high": "#242a38",
+            "secondary-fixed": "#c4e7ff",
+            "surface-container-lowest": "#080e1b",
+            "on-secondary-fixed-variant": "#004c69",
+            "border-subtle": "rgba(56, 189, 248, 0.14)"
+          },
+          fontFamily: {
+            "body-sm": ["Inter", "sans-serif"],
+            "headline-md": ["Inter", "sans-serif"],
+            "label-tactical": ["JetBrains Mono", "monospace"],
+            "telemetry-metric": ["JetBrains Mono", "monospace"],
+            "headline-xl": ["Inter", "sans-serif"],
+            "headline-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "telemetry-code": ["JetBrains Mono", "monospace"]
+          },
+          fontSize: {
+            "body-sm": ["11px", { lineHeight: "16px", fontWeight: "400" }],
+            "headline-md": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+            "label-tactical": ["10px", { lineHeight: "12px", fontWeight: "600" }],
+            "telemetry-metric": ["28px", { lineHeight: "32px", fontWeight: "700" }],
+            "headline-xl": ["32px", { lineHeight: "38px", fontWeight: "700" }],
+            "headline-lg": ["22px", { lineHeight: "28px", fontWeight: "600" }],
+            "body-md": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+            "body-lg": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+            "telemetry-code": ["12px", { lineHeight: "16px", fontWeight: "500" }]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body { width: 100vw; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; min-height: max(884px, 100dvh); }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    #qrcode img, #qrcode canvas {
+      max-width: 190px !important;
+      height: auto !important;
+      margin: 0 auto;
+    }
+  </style>
   <script src="js/qrcode.min.js"></script>
   <script>if (typeof QRCode === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>'); }</script>
 </head>
-<body class="mobile-layout">
+<body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen">
 
-  <!-- Mobile App Header -->
-  <header class="mobile-header">
-    <div class="mobile-brand">
-      <a href="index.html" style="display: flex; align-items: center; gap: 6px;">
-        <img src="assets/logo.jpg" alt="JalSanjeevani">
-        <h2 style="font-size: 0.95rem;">JalSanjeevani Driver</h2>
-      </a>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <span id="networkStatusBadge" style="font-size: 0.68rem; padding: 2px 7px; border-radius: 9999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
-        <span id="networkStatusDot" style="width: 5px; height: 5px; border-radius: 50%; background: #10b981;"></span>
-        <span id="networkStatusText">Online</span>
-      </span>
-      <select id="langSwitcher" class="lang-select-sm" style="padding: 3px 6px; font-size: 0.75rem;" aria-label="Language Selector">
-        <option value="en">EN</option>
-        <option value="mr">मराठी</option>
-        <option value="hi">हिंदी</option>
-      </select>
-      <span class="user-badge">Tanker #04</span>
+  <!-- Tactical Header -->
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-panel/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.35)] border-b border-white/5">
+    <div class="h-20 px-4 flex flex-col justify-between py-2">
+      <div class="flex items-center justify-between gap-2">
+        <a href="index.html" class="flex items-center gap-2">
+          <img alt="JalSanjeevani Logo" class="h-8 w-auto object-contain rounded" src="assets/logo.jpg"/>
+          <div class="flex flex-col">
+            <span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight leading-none">JalSanjeevani</span>
+            <span class="font-label-tactical text-label-tactical text-primary uppercase tracking-widest">Driver PWA</span>
+          </div>
+        </a>
+
+        <div class="flex items-center gap-2">
+          <!-- Online/Offline Live Network Indicator -->
+          <div id="networkStatusBadge" class="flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded-full border border-safe-emerald/30">
+            <span id="networkStatusDot" class="w-2 h-2 rounded-full bg-safe-emerald animate-pulse"></span>
+            <span id="networkStatusText" class="font-label-tactical text-label-tactical text-safe-emerald uppercase font-bold tracking-tight">Online</span>
+          </div>
+
+          <!-- Tanker Identifier Badge -->
+          <div class="bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+            <span class="font-label-tactical text-label-tactical text-primary font-bold">TK-04</span>
+          </div>
+
+          <!-- Language Selector -->
+          <div class="relative flex items-center">
+            <select id="langSwitcher" class="appearance-none bg-surface-container-high text-on-surface-variant font-label-tactical text-label-tactical py-1 pl-2 pr-5 rounded border border-white/10 focus:outline-none" aria-label="Language Selector">
+              <option value="en">EN</option>
+              <option value="mr">मराठी</option>
+              <option value="hi">हिंदी</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-0.5 pointer-events-none text-on-surface-variant text-[14px]">expand_more</span>
+          </div>
+
+          <!-- Profile Badge -->
+          <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-primary text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector & Role Sub-strip -->
+      <div class="flex items-center justify-between px-1 pb-0.5">
+        <div class="flex items-center gap-2">
+          <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">Active Sector:</span>
+          <span class="font-label-tactical text-label-tactical text-secondary font-semibold uppercase">Ahilyanagar - Sinnar</span>
+        </div>
+        <div class="flex items-center">
+          <span class="font-label-tactical text-label-tactical text-on-surface font-semibold uppercase tracking-wider">Driver Cockpit</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Main Driver Viewport -->
-  <main class="mobile-content">
-    
-    <!-- Active Dispatch Manifest -->
-    <div class="manifest-card glass-panel">
-      <h3>
-        <span>Target: Khopadi Cistern</span>
-        <span id="transitBadge" style="font-size: 0.75rem; color: var(--telemetry-emerald);">● IN TRANSIT</span>
-      </h3>
-      <div class="detail-row">
-        <span>Load Volume</span>
-        <span style="color: var(--primary-color);">10,000 Liters</span>
+  <!-- Main Cockpit Viewport -->
+  <main class="flex flex-col relative w-full pt-24 pb-24 bg-surface min-h-screen">
+    <div class="flex flex-col w-full px-4 py-2 space-y-3 max-w-lg mx-auto">
+
+      <!-- Mission Alert Banner & Telemetry Pings -->
+      <div class="flex items-center justify-between bg-surface-container-low px-3 py-2 rounded-xl shadow-sm border border-white/5">
+        <div class="flex items-center space-x-2">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-safe-emerald opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-safe-emerald"></span>
+          </span>
+          <span class="font-label-tactical text-label-tactical text-safe-emerald uppercase font-bold tracking-wider">Mission TK-04 Active</span>
+        </div>
+        <div class="flex items-center space-x-1.5 text-on-surface-variant font-label-tactical text-label-tactical">
+          <span class="material-symbols-outlined text-[14px] text-primary">satellite_alt</span>
+          <span>9 Sats Lock</span>
+          <span class="text-surface-variant">•</span>
+          <span class="text-secondary font-semibold">Corridor OK</span>
+        </div>
       </div>
-      <div class="detail-row">
-        <span>Statutory Allocation</span>
-        <span>40L / Citizen • 70L / Cattle</span>
+
+      <!-- Primary Target Mission Card -->
+      <div class="bg-surface-card rounded-xl p-4 shadow-xl flex flex-col space-y-3 relative overflow-hidden border border-white/5">
+        <!-- Ambient cyan corner glow -->
+        <div class="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+
+        <!-- Target Title & Transit Pill -->
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex flex-col">
+            <span class="font-label-tactical text-label-tactical text-primary uppercase tracking-widest">Active Dispatch Order</span>
+            <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight mt-0.5">
+              Target: Khopadi Cistern
+            </h1>
+          </div>
+          <div class="inline-flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full shrink-0 border border-primary/20">
+            <span id="transitDot" class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            <span id="transitBadge" class="font-label-tactical text-label-tactical font-bold text-primary uppercase tracking-wider">IN TRANSIT</span>
+          </div>
+        </div>
+
+        <!-- Primary Volume Highlight -->
+        <div class="flex items-baseline justify-between bg-surface-container-lowest/80 p-3 rounded-lg border border-white/5">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">water_drop</span>
+            </div>
+            <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Load Volume</span>
+          </div>
+          <div class="text-right">
+            <span class="font-telemetry-metric text-telemetry-metric text-primary tracking-tight font-bold">10,000</span>
+            <span class="font-label-tactical text-label-tactical text-secondary ml-1 font-bold">Liters</span>
+          </div>
+        </div>
+
+        <!-- Mission Specifications Grid -->
+        <div class="grid grid-cols-1 gap-2 text-on-surface">
+          <!-- Statutory Allocation -->
+          <div class="flex items-center justify-between bg-surface-container/60 px-3 py-2 rounded">
+            <div class="flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[16px] text-safe-emerald">verified_user</span>
+              <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Statutory Allocation</span>
+            </div>
+            <span class="font-body-md text-body-md font-semibold text-safe-emerald">40L / Citizen • 70L / Cattle</span>
+          </div>
+
+          <!-- Designated Cistern -->
+          <div class="flex items-center justify-between bg-surface-container/60 px-3 py-2 rounded">
+            <div class="flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[16px] text-secondary">warehouse</span>
+              <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Designated Cistern</span>
+            </div>
+            <span class="font-body-md text-body-md font-semibold text-on-surface">Gram Panchayat Enclosure #02</span>
+          </div>
+
+          <!-- Required Handshake -->
+          <div class="flex items-center justify-between bg-surface-container/60 px-3 py-2 rounded">
+            <div class="flex items-center space-x-2">
+              <span class="material-symbols-outlined text-[16px] text-warning-amber">badge</span>
+              <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Required Handshake</span>
+            </div>
+            <span class="font-body-md text-body-md font-semibold text-warning-amber">Gram Panchayat Secretary</span>
+          </div>
+        </div>
       </div>
-      <div class="detail-row">
-        <span>Designated Cistern</span>
-        <span>Gram Panchayat Enclosure #02</span>
+
+      <!-- Arrival Coordinates & Proximity Trigger Card -->
+      <div class="bg-surface-panel rounded-xl p-4 shadow-lg flex flex-col space-y-2.5 border border-white/5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span id="geofenceRadarIcon" class="material-symbols-outlined text-[20px] text-primary animate-pulse">radar</span>
+            <div class="flex flex-col">
+              <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase tracking-wider">Geo-Telemetry Distance</span>
+              <span id="geofenceStatusText" class="font-body-lg text-body-lg font-bold text-on-surface">Geofence: 180m from Target</span>
+            </div>
+          </div>
+          <span id="geofenceRangeBadge" class="bg-warning-amber/15 text-warning-amber px-2 py-0.5 rounded font-label-tactical text-label-tactical uppercase font-bold">Within Corridor</span>
+        </div>
+
+        <!-- Tactile Push Trigger Button -->
+        <button id="btnLogArrival" class="w-full min-h-[50px] bg-primary-container text-on-primary-container hover:bg-primary font-headline-md text-headline-md font-bold rounded-xl shadow-lg flex items-center justify-center space-x-2 active:scale-[0.98] transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[22px]">where_to_vote</span>
+          <span id="btnLogArrivalText">Log Arrival Coordinates</span>
+        </button>
+
+        <div id="arrivalSuccessBanner" class="hidden flex items-center space-x-1.5 justify-center py-1.5 bg-safe-emerald/10 rounded-lg text-safe-emerald border border-safe-emerald/20">
+          <span class="material-symbols-outlined text-[16px]">check_circle</span>
+          <span class="font-label-tactical text-label-tactical uppercase font-semibold">GPS Verified (12m Perimeter) &amp; Synced to District Node</span>
+        </div>
       </div>
-      <div class="detail-row">
-        <span>Required Handshake</span>
-        <span>Gram Panchayat Secretary</span>
+
+      <!-- Cryptographic Token Presentation Container -->
+      <div class="bg-surface-card rounded-xl p-4 shadow-xl flex flex-col items-center space-y-3 text-center border border-white/5">
+        <div class="flex flex-col space-y-1">
+          <div class="flex items-center justify-center space-x-1.5 text-primary">
+            <span class="material-symbols-outlined text-[18px]">lock</span>
+            <span class="font-label-tactical text-label-tactical uppercase tracking-wider font-bold">Dual-Key Escrow Verification</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-xs px-2">
+            Present this offline cryptographic QR token to the Panchayat official at the community cistern to unlock payment escrow.
+          </p>
+        </div>
+
+        <!-- High-Contrast Scannable White Pod -->
+        <div class="w-full max-w-[280px] bg-white p-3 rounded-xl shadow-2xl flex flex-col items-center justify-center space-y-2">
+          <!-- Live Scannable High-Density QR Code -->
+          <div id="qrcode" class="w-52 h-52 flex items-center justify-center relative p-1 bg-white"></div>
+
+          <!-- Token Identification Strip -->
+          <div class="bg-slate-100 text-slate-800 px-3 py-1.5 rounded w-full flex items-center justify-center space-x-1.5">
+            <span class="material-symbols-outlined text-[13px] text-slate-600">vpn_key</span>
+            <span id="driverCryptoKey" class="font-label-tactical text-label-tactical tracking-wider font-bold">KEY: 0x9F3B4E • GEOFENCE ENCRYPTED</span>
+          </div>
+        </div>
+
+        <!-- Action Toolbar Row -->
+        <div class="grid grid-cols-3 gap-2 w-full max-w-sm pt-1">
+          <!-- Copy Token -->
+          <button id="copyTokenBtn" class="bg-surface-container hover:bg-surface-container-high py-2.5 px-1 rounded-lg flex items-center justify-center space-x-1 text-on-surface transition-all active:scale-95 shadow-sm border border-white/5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px] text-primary">content_copy</span>
+            <span class="font-label-tactical text-label-tactical font-semibold">Copy Token</span>
+          </button>
+          <!-- Save Image -->
+          <button id="saveImageBtn" class="bg-surface-container hover:bg-surface-container-high py-2.5 px-1 rounded-lg flex items-center justify-center space-x-1 text-on-surface transition-all active:scale-95 shadow-sm border border-white/5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px] text-secondary">download</span>
+            <span class="font-label-tactical text-label-tactical font-semibold">Save Image</span>
+          </button>
+          <!-- View JSON Proof -->
+          <button id="toggleJsonBtn" class="bg-surface-container hover:bg-surface-container-high py-2.5 px-1 rounded-lg flex items-center justify-center space-x-1 text-on-surface transition-all active:scale-95 shadow-sm border border-white/5 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px] text-tertiary">code</span>
+            <span class="font-label-tactical text-label-tactical font-semibold">View JSON</span>
+          </button>
+        </div>
+
+        <!-- Expandable JSON Proof Inspector -->
+        <div id="jsonProofDrawer" class="hidden w-full text-left bg-surface-container-lowest p-3 rounded-lg font-telemetry-code text-telemetry-code text-primary space-y-1 border border-white/10">
+          <div class="flex justify-between items-center text-on-surface-variant font-label-tactical text-label-tactical">
+            <span>CRYPTOGRAPHIC_ESCROW_PAYLOAD.JSON</span>
+            <button id="closeJsonProofBtn" class="text-on-surface hover:text-alert-crimson font-bold text-sm">✕</button>
+          </div>
+          <pre id="payloadJsonView" class="overflow-x-auto text-[10px] leading-4 text-secondary bg-surface-base p-2 rounded max-h-48 whitespace-pre-wrap word-break-all"></pre>
+        </div>
       </div>
+
+      <!-- Operational Diagnostics Strip -->
+      <div class="bg-surface-panel rounded-xl p-3 flex items-center justify-between text-on-surface-variant border border-white/5">
+        <div class="flex items-center space-x-2">
+          <span class="material-symbols-outlined text-[16px] text-primary">local_gas_station</span>
+          <div class="flex flex-col">
+            <span class="font-label-tactical text-label-tactical">Diesel Reserve</span>
+            <span class="font-telemetry-code text-telemetry-code text-on-surface font-semibold">76% (Est. 140km)</span>
+          </div>
+        </div>
+        <div class="h-6 w-[1px] bg-surface-variant"></div>
+        <div class="flex items-center space-x-2">
+          <span class="material-symbols-outlined text-[16px] text-safe-emerald">shield</span>
+          <div class="flex flex-col">
+            <span class="font-label-tactical text-label-tactical">Flow Seal Tamper</span>
+            <span class="font-telemetry-code text-telemetry-code text-safe-emerald font-semibold">Intact (0.00 PSI)</span>
+          </div>
+        </div>
+        <div class="h-6 w-[1px] bg-surface-variant"></div>
+        <button id="sosBeaconBtn" class="flex items-center space-x-1 bg-alert-crimson/15 hover:bg-alert-crimson/25 text-alert-crimson px-2.5 py-1.5 rounded transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">sos</span>
+          <span class="font-label-tactical text-label-tactical font-bold uppercase">Corridor SOS</span>
+        </button>
+      </div>
+
+      <!-- Role Quick Jumps -->
+      <div class="grid grid-cols-3 gap-2 pt-1">
+        <a class="flex items-center justify-center space-x-1 py-2.5 px-1 bg-surface-container-high/60 hover:bg-surface-container-high rounded-xl text-on-surface text-center shadow-sm border border-white/5 transition-all" href="panchayat.html">
+          <span class="material-symbols-outlined text-[16px] text-primary">smartphone</span>
+          <span class="font-label-tactical text-label-tactical font-semibold uppercase">Panchayat View</span>
+        </a>
+        <a class="flex items-center justify-center space-x-1 py-2.5 px-1 bg-surface-container-high/60 hover:bg-surface-container-high rounded-xl text-on-surface text-center shadow-sm border border-white/5 transition-all" href="dashboard.html">
+          <span class="material-symbols-outlined text-[16px] text-secondary">satellite_alt</span>
+          <span class="font-label-tactical text-label-tactical font-semibold uppercase">Collector View</span>
+        </a>
+        <a class="flex items-center justify-center space-x-1 py-2.5 px-1 bg-surface-container-high/60 hover:bg-alert-crimson/20 rounded-xl text-alert-crimson text-center shadow-sm border border-white/5 transition-all" href="index.html">
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          <span class="font-label-tactical text-label-tactical font-semibold uppercase">Sign Out</span>
+        </a>
+      </div>
+
     </div>
 
-    <!-- Geofence Audit Card -->
-    <div class="geofence-box">
-      <div class="geofence-status">
-        <span class="status-dot" id="geofenceDot" style="background: var(--accent-amber);"></span>
-        <span id="geofenceStatusText">Geofence: 180m from Target</span>
-      </div>
-      <button id="btnArrived" class="btn btn-primary btn-sm">
-        Log Arrival Coordinates
-      </button>
-    </div>
-
-    <!-- Cryptographic QR Manifest -->
-    <div class="glass-panel" style="padding: 1.25rem;">
-      <p class="qr-instructions">
-        Present this offline cryptographic QR token to the Panchayat official at the community cistern to unlock payment escrow.
-      </p>
-
-      <div class="qr-container">
-        <div id="qrcode"></div>
-        <span class="crypto-hash" id="driverCryptoKey">KEY: 0x9F3B4E • GEOFENCE ENCRYPTED</span>
-      </div>
-
-      <!-- Quick Action Controls for Driver & Verification -->
-      <div style="display: flex; gap: 6px; margin-top: 12px;">
-        <button id="btnCopyPayload" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
-          📋 Copy Token
-        </button>
-        <button id="btnDownloadQR" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
-          💾 Save Image
-        </button>
-        <button id="btnTogglePayload" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
-          🔍 View JSON
-        </button>
-      </div>
-
-      <pre id="payloadJsonView" class="payload-preview" style="display: none;"></pre>
-    </div>
-
-    <!-- Toast Notification for Driver Actions -->
-    <div id="driverToast" style="display: none; position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-weight: 500;"></div>
-
+    <!-- Floating Toast Notification -->
+    <div id="driverToast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 bg-safe-emerald text-surface-base px-4 py-2 rounded-xl text-body-sm font-semibold shadow-2xl z-50"></div>
   </main>
 
-  <!-- Bottom App Switcher -->
-  <footer class="mobile-bottom-nav">
-    <a href="panchayat.html" class="btn btn-outline btn-sm" style="flex: 1; text-align: center; font-size: 0.78rem;">
-      📱 Panchayat View
-    </a>
-    <a href="dashboard.html" class="btn btn-outline btn-sm" style="flex: 1; text-align: center; font-size: 0.78rem;">
-      🛰️ Collector View
-    </a>
-    <a href="index.html" class="btn btn-outline btn-sm" style="text-align: center; font-size: 0.78rem;">
-      Sign Out
-    </a>
-  </footer>
+  <!-- Sticky Bottom Tactical Navigation -->
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-panel/95 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.5)] border-t border-white/5">
+    <div class="flex justify-around items-center h-16 px-2">
+      <a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] px-2 rounded-xl transition-all gap-0.5 text-primary font-bold bg-primary/10" href="driver.html">
+        <span class="material-symbols-outlined text-[20px]">navigation</span>
+        <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-center">Cockpit</span>
+      </a>
+      <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] px-2 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" href="panchayat.html">
+        <span class="material-symbols-outlined text-[20px]">verified</span>
+        <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-center">Handshake</span>
+      </a>
+      <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] px-2 rounded-xl text-on-surface-variant hover:text-on-surface transition-all gap-0.5" href="dashboard.html">
+        <span class="material-symbols-outlined text-[20px]">monitoring</span>
+        <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-center">Telemetry</span>
+      </a>
+      <a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] px-2 rounded-xl text-on-surface-variant hover:text-alert-crimson transition-all gap-0.5" href="index.html">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-center">Exit</span>
+      </a>
+    </div>
+  </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
