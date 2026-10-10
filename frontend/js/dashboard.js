@@ -22,11 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add Zoom control to top right
   L.control.zoom({ position: 'topright' }).addTo(map);
 
-  // High-contrast Dark mode basemap (CartoDB Dark Matter)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 20
+  // High-contrast Dark mode basemap (Esri Dark Canvas - Free, Clean, No Watermark)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri &mdash; National Geographic, DeLorme, NAVTEQ',
+    maxZoom: 16
+  }).addTo(map);
+
+  // Dark Canvas Road and Hamlet Labels Overlay
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '',
+    maxZoom: 16
   }).addTo(map);
 
   // Layer groups for toggleable telemetry
