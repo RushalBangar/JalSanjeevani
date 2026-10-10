@@ -148,29 +148,53 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 -- ==============================================================================
--- Initial Seed Data: Sinnar Taluka, Maharashtra
+-- Initial Seed Data: Ahilyanagar District & Sinnar Taluka, Maharashtra
 -- ==============================================================================
 INSERT INTO public.villages (id, name, lat, lng, status, population, cattle, depletion_rate, hours_remaining, cistern_level, cistern_capacity)
 VALUES
-    ('1', 'Pangari', 19.85, 73.95, 'critical', 2400, 800, '-4.8 cm/day', 18, '12%', 25000),
-    ('2', 'Wadgaon', 19.81, 74.05, 'warning', 1500, 450, '-2.1 cm/day', 96, '38%', 25000),
-    ('3', 'Khopadi', 19.90, 74.10, 'critical', 3200, 1200, '-5.2 cm/day', 14, '8%', 25000),
-    ('4', 'Nandur', 19.78, 73.90, 'safe', 4100, 1500, '-0.8 cm/day', 380, '72%', 30000)
+    ('AH-01', 'Tisgaon (Pathardi)', 19.1415, 75.0512, 'critical', 4850, 1620, '-5.4 cm/day', 14, '9%', 30000),
+    ('AH-02', 'Supa (Parner)', 18.9984, 74.4568, 'critical', 3900, 1250, '-4.9 cm/day', 22, '14%', 25000),
+    ('AH-03', 'Kharki (Jamkhed)', 18.7280, 75.3120, 'critical', 2800, 980, '-6.1 cm/day', 11, '7%', 25000),
+    ('AH-04', 'Rashin (Karjat)', 18.5526, 75.0064, 'warning', 5200, 2100, '-3.4 cm/day', 56, '28%', 35000),
+    ('AH-05', 'Bodhegaon (Shevgaon)', 19.3486, 75.2185, 'warning', 3450, 1120, '-2.8 cm/day', 72, '34%', 25000),
+    ('AH-06', 'Ashwi (Sangamner)', 19.5772, 74.2085, 'warning', 3150, 1050, '-3.1 cm/day', 64, '31%', 25000),
+    ('AH-07', 'Vambori (Rahuri)', 19.3905, 74.6514, 'safe', 6100, 2400, '-1.1 cm/day', 210, '68%', 40000),
+    ('AH-08', 'Kashti (Shrigonda)', 18.6148, 74.6969, 'safe', 4300, 1540, '-1.3 cm/day', 180, '62%', 30000),
+    ('AH-09', 'Bhingar Rural (Nagar)', 19.1120, 74.7710, 'safe', 5800, 1400, '-0.9 cm/day', 340, '78%', 45000),
+    ('SN-01', 'Pangari Bk (Sinnar)', 19.8512, 73.9540, 'critical', 2450, 820, '-4.8 cm/day', 16, '11%', 25000),
+    ('SN-02', 'Khopadi (Sinnar)', 19.9015, 74.1030, 'critical', 3350, 1280, '-5.2 cm/day', 13, '7%', 25000),
+    ('SN-03', 'Wadgaon (Sinnar)', 19.8130, 74.0520, 'warning', 1620, 490, '-2.3 cm/day', 88, '36%', 25000),
+    ('SN-04', 'Dubere (Sinnar)', 19.8210, 73.9120, 'warning', 2900, 940, '-2.6 cm/day', 78, '33%', 25000),
+    ('SN-05', 'Dapur (Sinnar)', 19.8820, 73.9210, 'safe', 2100, 670, '-1.2 cm/day', 195, '65%', 25000),
+    ('SN-06', 'Nandur Shingote', 19.7820, 73.9010, 'safe', 5400, 1850, '-0.8 cm/day', 380, '74%', 40000)
 ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    lat = EXCLUDED.lat,
+    lng = EXCLUDED.lng,
     status = EXCLUDED.status,
     population = EXCLUDED.population,
     cattle = EXCLUDED.cattle,
     depletion_rate = EXCLUDED.depletion_rate,
     hours_remaining = EXCLUDED.hours_remaining,
-    cistern_level = EXCLUDED.cistern_level;
+    cistern_level = EXCLUDED.cistern_level,
+    cistern_capacity = EXCLUDED.cistern_capacity;
 
 INSERT INTO public.tankers (id, registration, capacity_liters, lat, lng, status, is_rogue, anomaly_detail, target_village, driver_name)
 VALUES
-    ('TN-12', 'MH-15-AG-402', 10000, 19.83, 73.98, 'en_route', false, 'Geofence Compliant', 'Pangari', 'Suresh Jadhav'),
-    ('TN-04', 'MH-15-AG-982', 10000, 19.88, 74.02, 'en_route', false, 'Geofence Compliant', 'Khopadi', 'Ramesh Shinde'),
-    ('TN-07', 'MH-15-TK-889', 10000, 19.75, 74.15, 'diverted', true, '12km Off-Route Anomaly - GPS Handshake Missing', 'Unassigned', 'Unknown / Rogue')
+    ('TN-AH-01', 'MH-16-AY-2104', 12000, 19.1250, 74.8210, 'en_route', false, 'Geofence Compliant (Nagar-Pathardi Route)', 'Tisgaon (Pathardi)', 'Balasaheb Thorat'),
+    ('TN-AH-02', 'MH-16-BZ-5512', 10000, 18.7840, 75.2510, 'en_route', false, 'Geofence Compliant (Jamkhed Emergency Line)', 'Kharki (Jamkhed)', 'Nitin Garje'),
+    ('TN-AH-03', 'MH-16-CD-8841', 12000, 19.0310, 74.5210, 'en_route', false, 'Geofence Compliant (Parner Industrial Line)', 'Supa (Parner)', 'Gorakh Shinde'),
+    ('TN-SN-01', 'MH-15-AG-4029', 10000, 19.8410, 73.9720, 'en_route', false, 'Geofence Compliant (Sinnar-Pangari Corridor)', 'Pangari Bk (Sinnar)', 'Suresh Jadhav'),
+    ('TN-SN-02', 'MH-15-AG-9821', 10000, 19.8920, 74.0610, 'en_route', false, 'Geofence Compliant (Sinnar-Khopadi Corridor)', 'Khopadi (Sinnar)', 'Ramesh Shinde'),
+    ('TN-ROGUE', 'MH-16-TX-9901', 10000, 18.6210, 74.9210, 'diverted', true, '14km Off-Route Anomaly - Diverted towards private commercial site', 'Unassigned', 'Flagged Contractor / Unknown')
 ON CONFLICT (id) DO UPDATE SET
+    registration = EXCLUDED.registration,
+    capacity_liters = EXCLUDED.capacity_liters,
     lat = EXCLUDED.lat,
     lng = EXCLUDED.lng,
     is_rogue = EXCLUDED.is_rogue,
-    status = EXCLUDED.status;
+    status = EXCLUDED.status,
+    anomaly_detail = EXCLUDED.anomaly_detail,
+    target_village = EXCLUDED.target_village,
+    driver_name = EXCLUDED.driver_name;
+

@@ -309,6 +309,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }));
         renderVillageMarkers();
         renderVillageList();
+        if (Object.keys(markersMap).length > 0) {
+          const bounds = L.latLngBounds(Object.values(markersMap).map(m => m.coords));
+          map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+        }
         console.log("🌊 [JalSanjeevani] Loaded villages from Supabase PostgreSQL:", villages.length);
       }
 
@@ -318,6 +322,13 @@ document.addEventListener("DOMContentLoaded", () => {
         dbTankers.forEach(t => {
           if (tankerMarkers[t.id]) {
             tankerMarkers[t.id].setLatLng([t.lat, t.lng]);
+          } else {
+            const icon = t.is_rogue ? rogueTankerIcon : tankerIcon;
+            const targetLayer = t.is_rogue ? rogueLayer : fleetLayer;
+            const marker = L.marker([t.lat, t.lng], { icon: icon })
+              .bindPopup(`<b>${t.id} (${t.registration})</b><br>${t.is_rogue ? "<span style='color:#ef4444;'>Diverted Anomaly</span>" : "<span style='color:#10b981;'>Geofence Compliant</span>"}<br>Driver: ${t.driver_name || 'Assigned'}<br>Target: ${t.target_village || 'Depot'}`)
+              .addTo(targetLayer);
+            tankerMarkers[t.id] = marker;
           }
         });
         console.log("🌊 [JalSanjeevani] Loaded tankers from Supabase PostgreSQL:", dbTankers.length);
@@ -332,8 +343,16 @@ document.addEventListener("DOMContentLoaded", () => {
           tankerMarkers[record.id].setPopupContent(`
             <b>${record.id} (${record.registration})</b><br>
             ${record.is_rogue ? "<span style='color:#ef4444;'>Diverted Anomaly</span>" : "<span style='color:#10b981;'>Geofence Compliant</span>"}<br>
+            Driver: ${record.driver_name || 'Assigned'}<br>
             Target: ${record.target_village || 'Depot'}
           `);
+        } else {
+          const icon = record.is_rogue ? rogueTankerIcon : tankerIcon;
+          const targetLayer = record.is_rogue ? rogueLayer : fleetLayer;
+          const marker = L.marker([record.lat, record.lng], { icon: icon })
+            .bindPopup(`<b>${record.id} (${record.registration})</b><br>${record.is_rogue ? "<span style='color:#ef4444;'>Diverted Anomaly</span>" : "<span style='color:#10b981;'>Geofence Compliant</span>"}<br>Driver: ${record.driver_name || 'Assigned'}<br>Target: ${record.target_village || 'Depot'}`)
+            .addTo(targetLayer);
+          tankerMarkers[record.id] = marker;
         }
       });
 
