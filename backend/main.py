@@ -7,18 +7,32 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 
-from solver import optimize_routes
-from geospatial import (
-    calculate_statutory_quota,
-    predict_14day_scarcity,
-    get_regional_satellite_telemetry,
-    calculate_haversine_distance,
-    fetch_live_satellite_data
-)
-from security import (
-    verify_delivery_handshake,
-    generate_handshake_signature
-)
+try:
+    from solver import optimize_routes
+    from geospatial import (
+        calculate_statutory_quota,
+        predict_14day_scarcity,
+        get_regional_satellite_telemetry,
+        calculate_haversine_distance,
+        fetch_live_satellite_data
+    )
+    from security import (
+        verify_delivery_handshake,
+        generate_handshake_signature
+    )
+except ImportError:
+    from backend.solver import optimize_routes
+    from backend.geospatial import (
+        calculate_statutory_quota,
+        predict_14day_scarcity,
+        get_regional_satellite_telemetry,
+        calculate_haversine_distance,
+        fetch_live_satellite_data
+    )
+    from backend.security import (
+        verify_delivery_handshake,
+        generate_handshake_signature
+    )
 
 # Load environment configuration
 try:
@@ -71,6 +85,9 @@ class DispatchRequest(BaseModel):
     villages: List[VillageModel]
     num_tankers: int = 2
     tanker_capacity: int = 250000  # Default cumulative capacity
+    depot_lat: Optional[float] = None
+    depot_lng: Optional[float] = None
+    depot_name: Optional[str] = None
 
 class DeliveryVerificationRequest(BaseModel):
     tanker_id: str
@@ -238,7 +255,7 @@ def update_tanker_telemetry(ping: TankerTelemetryPing):
             supabase_client.table("tankers").update({
                 "lat": ping.lat,
                 "lng": ping.lng,
-                "updated_at": datetime.datetime.utcnow().isoformat()
+                "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }).eq("id", ping.tanker_id).execute()
         except Exception as e:
             print(f"Telemetry update error: {e}")
@@ -248,7 +265,7 @@ def update_tanker_telemetry(ping: TankerTelemetryPing):
         "tanker_id": ping.tanker_id,
         "lat": ping.lat,
         "lng": ping.lng,
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
 
 # -----------------------------------------------------------------------------
@@ -263,7 +280,14 @@ async def allocate_tankers(request: DispatchRequest):
     """
     distressed_villages = [v for v in request.villages if v.status in ["critical", "warning"]]
     
-    routes = optimize_routes(distressed_villages, request.num_tankers, request.tanker_capacity)
+    depot_coords = (request.depot_lat, request.depot_lng) if (request.depot_lat is not None and request.depot_lng is not None) else None
+    routes = optimize_routes(
+        distressed_villages,
+        request.num_tankers,
+        request.tanker_capacity,
+        depot_coords=depot_coords,
+        depot_name=request.depot_name
+    )
     total_req = sum([v.human_pop * 40 + v.cattle_pop * 70 for v in distressed_villages])
     
     if supabase_client and routes:
@@ -356,7 +380,7 @@ def freeze_escrow(req: EscrowFreezeRequest):
         "reason": req.reason,
         "status": "FROZEN",
         "action_taken": "Contractor escrow balance withheld. RTO patrol alerted.",
-        "created_at": datetime.datetime.utcnow().isoformat()
+        "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
 
     if supabase_client:
@@ -392,9 +416,9 @@ def get_escrow_status():
     return {
         "count": 1,
         "actions": [{
-            "tanker_id": "TN-07",
+            "tanker_id": "TN-ROGUE",
             "penalty_amount": "₹1,45,000",
-            "reason": "12km Off-Route Anomaly - GPS Handshake Missing. Contractor balance withheld.",
+            "reason": "14km Off-Route Anomaly near Karjat - GPS Handshake Missing. Contractor balance withheld.",
             "status": "FROZEN"
         }]
     }
@@ -405,12 +429,12 @@ def export_manifest():
     Generates a cryptographically signed JSON manifest for District Collector,
     RTO patrols, and State Treasury audit clearance.
     """
-    timestamp = datetime.datetime.utcnow().isoformat()
+    timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
     manifest_id = "MAN-" + hashlib.sha256(timestamp.encode('utf-8')).hexdigest()[:12].upper()
 
     return {
         "manifest_id": manifest_id,
-        "jurisdiction": "Sinnar Taluka Disaster Management Authority, Nashik",
+        "jurisdiction": "Ahilyanagar & Sinnar Disaster Management Authority, Maharashtra",
         "timestamp": timestamp,
         "algorithm": "Google OR-Tools CVRP (Capacitated Vehicle Routing Problem)",
         "statutory_standards": {

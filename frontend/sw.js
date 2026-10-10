@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jalsanjeevani-cache-v2';
+const CACHE_NAME = 'jalsanjeevani-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS_TO_CACHE = [
   './driver.html',
   './panchayat.html',
   './css/variables.css',
+  './css/landing.css',
   './css/mobile.css',
   './css/dashboard.css',
   './css/login.css',

@@ -533,14 +533,14 @@ document.addEventListener("DOMContentLoaded", () => {
         alertBadge.textContent = "Escrow Frozen";
       }
 
-      rogueTanker.setPopupContent("<b>Tanker #07 (MH-15-TK-889)</b><br><span style='color:#ef4444; font-weight:bold;'>PAYMENT FROZEN & IMPOUND ORDERED (SUPABASE LOGGED)</span>");
+      rogueTanker.setPopupContent("<b>ALERT: Tanker #TN-ROGUE (MH-16-TX-9901)</b><br><span style='color:#ef4444; font-weight:bold;'>PAYMENT FROZEN & IMPOUND ORDERED (SUPABASE LOGGED)</span>");
 
       // Log Escrow Freeze to Supabase
       if (window.JalSupabase) {
         window.JalSupabase.saveEscrowAction(
-          "TN-07",
+          "TN-ROGUE",
           "₹1,45,000",
-          "12km Off-Route Anomaly - GPS Handshake Missing. Contractor balance withheld."
+          "14km Off-Route Anomaly near Karjat - GPS Handshake Missing. Contractor balance withheld."
         );
       }
     });
@@ -675,14 +675,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Export Route Manifest Handler
   btnExportManifest?.addEventListener("click", () => {
     const manifest = {
-      jurisdiction: "Sinnar Taluka Disaster Management Authority",
+      jurisdiction: "Ahilyanagar & Sinnar Disaster Management Authority, Maharashtra",
       timestamp: new Date().toISOString(),
       algorithm: "Google OR-Tools CVRP (Capacitated Vehicle Routing Problem)",
       statutory_human_quota: "40L/capita/day",
       statutory_cattle_quota: "70L/head/day",
       routes: generatedRouteData || [
-        { route_id: 1, tanker: "TN-12", destination: "Pangari", allocation: 152000 },
-        { route_id: 2, tanker: "TN-04", destination: "Khopadi & Wadgaon", allocation: 303500 }
+        { route_id: 1, tanker: "TN-AH-01", destination: "Tisgaon (Pathardi)", allocation: 152000 },
+        { route_id: 2, tanker: "TN-SN-02", destination: "Khopadi & Wadgaon", allocation: 303500 }
       ],
       cryptographic_token: "SHA256:4a8b9f1e2c3d5e6a7b8c9d0e"
     };
@@ -691,7 +691,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `sinnar_dispatch_manifest_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `jalsanjeevani_manifest_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   });

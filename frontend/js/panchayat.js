@@ -71,8 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Store signed delivery receipt locally
         const receipt = {
-          village: "Khopadi",
-          tanker: "TN-04",
+          village: "Khopadi (Sinnar)",
+          tanker: "TN-SN-02",
           volume: 10000,
           driver_key: "0x9F3B4ED812C4",
           cistern_key: "0x74CE8A1109B2",
@@ -90,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Sync with Supabase Database & Realtime
         if (window.JalSupabase) {
           window.JalSupabase.saveDeliveryReceipt(receipt);
+          window.JalSupabase.updateTankerLocation("TN-SN-02", 19.9015, 74.1030, false, "delivered");
           // Also update Khopadi village status in Supabase if client active
           if (window.JalSupabase.client) {
             window.JalSupabase.client
@@ -99,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 status: 'warning',
                 hours_remaining: 72
               })
-              .eq('id', '3')
+              .or('id.eq.SN-02,id.eq.3,name.ilike.%Khopadi%')
               .then(() => console.log("🌊 Village Khopadi cistern status updated in Supabase."));
           }
         }

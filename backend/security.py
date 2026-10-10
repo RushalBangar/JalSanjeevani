@@ -7,18 +7,65 @@ Validates Geofencing, Asymmetric QR Tokens, and Digital Signatures.
 import hmac
 import hashlib
 import time
-from typing import Dict, Any, Tuple
-from geospatial import calculate_haversine_distance
+import os
+from typing import Dict, Any, Tuple, Optional
+try:
+    from geospatial import calculate_haversine_distance
+except ImportError:
+    from backend.geospatial import calculate_haversine_distance
 
-GEOFENCE_RADIUS_METERS = 50.0  # Max allowable distance from cistern perimeter
+GEOFENCE_RADIUS_METERS = 200.0  # Max allowable distance (200m GPS buffer from cistern perimeter)
 
-# Known Village Cistern coordinates for geofence validation
+# Known Village Cistern coordinates across Ahilyanagar & Sinnar
 KNOWN_CISTERNS = {
-    "Pangari": {"lat": 19.85, "lng": 73.95, "cistern_key": "0x4A1E89B2"},
-    "Wadgaon": {"lat": 19.81, "lng": 74.05, "cistern_key": "0x5C89F12A"},
-    "Khopadi": {"lat": 19.90, "lng": 74.10, "cistern_key": "0x74CE8A1109B2"},
-    "Nandur":  {"lat": 19.78, "lng": 73.90, "cistern_key": "0x9812AC44"}
+    # --- Ahilyanagar District ---
+    "Tisgaon (Pathardi)": {"lat": 19.1415, "lng": 75.0512, "cistern_key": "0x4A1E89B2"},
+    "Tisgaon": {"lat": 19.1415, "lng": 75.0512, "cistern_key": "0x4A1E89B2"},
+    "Supa (Parner)": {"lat": 18.9984, "lng": 74.4568, "cistern_key": "0x5C89F12A"},
+    "Supa": {"lat": 18.9984, "lng": 74.4568, "cistern_key": "0x5C89F12A"},
+    "Kharki (Jamkhed)": {"lat": 18.7280, "lng": 75.3120, "cistern_key": "0x74CE8A11"},
+    "Kharki": {"lat": 18.7280, "lng": 75.3120, "cistern_key": "0x74CE8A11"},
+    "Rashin (Karjat)": {"lat": 18.5526, "lng": 75.0064, "cistern_key": "0x9812AC44"},
+    "Rashin": {"lat": 18.5526, "lng": 75.0064, "cistern_key": "0x9812AC44"},
+    "Bodhegaon (Shevgaon)": {"lat": 19.3486, "lng": 75.2185, "cistern_key": "0x3B7F1290"},
+    "Bodhegaon": {"lat": 19.3486, "lng": 75.2185, "cistern_key": "0x3B7F1290"},
+    "Ashwi (Sangamner)": {"lat": 19.5772, "lng": 74.2085, "cistern_key": "0x6A91CD45"},
+    "Ashwi": {"lat": 19.5772, "lng": 74.2085, "cistern_key": "0x6A91CD45"},
+    "Vambori (Rahuri)": {"lat": 19.3905, "lng": 74.6514, "cistern_key": "0x1290EA54"},
+    "Vambori": {"lat": 19.3905, "lng": 74.6514, "cistern_key": "0x1290EA54"},
+    "Kashti (Shrigonda)": {"lat": 18.6148, "lng": 74.6969, "cistern_key": "0x89AB2341"},
+    "Kashti": {"lat": 18.6148, "lng": 74.6969, "cistern_key": "0x89AB2341"},
+    "Bhingar Rural (Nagar)": {"lat": 19.1120, "lng": 74.7710, "cistern_key": "0x45FC7810"},
+    "Bhingar": {"lat": 19.1120, "lng": 74.7710, "cistern_key": "0x45FC7810"},
+
+    # --- Sinnar Taluka (Nashik) ---
+    "Pangari Bk (Sinnar)": {"lat": 19.8512, "lng": 73.9540, "cistern_key": "0x4A1E89B2"},
+    "Pangari": {"lat": 19.8512, "lng": 73.9540, "cistern_key": "0x4A1E89B2"},
+    "Khopadi (Sinnar)": {"lat": 19.9015, "lng": 74.1030, "cistern_key": "0x74CE8A1109B2"},
+    "Khopadi": {"lat": 19.9015, "lng": 74.1030, "cistern_key": "0x74CE8A1109B2"},
+    "Wadgaon (Sinnar)": {"lat": 19.8130, "lng": 74.0520, "cistern_key": "0x5C89F12A"},
+    "Wadgaon": {"lat": 19.8130, "lng": 74.0520, "cistern_key": "0x5C89F12A"},
+    "Dubere (Sinnar)": {"lat": 19.8210, "lng": 73.9120, "cistern_key": "0x34AB5678"},
+    "Dubere": {"lat": 19.8210, "lng": 73.9120, "cistern_key": "0x34AB5678"},
+    "Dapur (Sinnar)": {"lat": 19.8820, "lng": 73.9210, "cistern_key": "0x9812AC44"},
+    "Dapur": {"lat": 19.8820, "lng": 73.9210, "cistern_key": "0x9812AC44"},
+    "Nandur Shingote": {"lat": 19.7820, "lng": 73.9010, "cistern_key": "0x9812AC44"},
+    "Nandur": {"lat": 19.7820, "lng": 73.9010, "cistern_key": "0x9812AC44"}
 }
+
+def get_cistern_info(village_name: str) -> Optional[Dict[str, Any]]:
+    """Resolves cistern coordinates and keys via static registry or dynamic fuzzy match."""
+    # 1. Direct match
+    if village_name in KNOWN_CISTERNS:
+        return KNOWN_CISTERNS[village_name]
+
+    # 2. Case-insensitive / prefix match
+    v_clean = village_name.strip().lower()
+    for name, info in KNOWN_CISTERNS.items():
+        if name.lower() in v_clean or v_clean in name.lower():
+            return info
+
+    return None
 
 def generate_handshake_signature(tanker_id: str, village_name: str, volume: int, timestamp: str) -> str:
     """Generates deterministic SHA-256 cryptographic signature for delivery receipt."""
@@ -36,17 +83,17 @@ def verify_delivery_handshake(
 ) -> Tuple[bool, Dict[str, Any]]:
     """
     Validates delivery handshake:
-    1. Geofence Distance Check (< 50 meters from statutory cistern GPS)
+    1. Geofence Distance Check (< 200 meters from statutory cistern GPS)
     2. Cistern Key Authorization Match
     3. Volume Check
     4. Generates Treasury Escrow Authorization Hash
     """
-    village_info = KNOWN_CISTERNS.get(target_village)
+    village_info = get_cistern_info(target_village)
     
     if not village_info:
         return False, {
             "status": "REJECTED_UNKNOWN_VILLAGE",
-            "message": f"Target village '{target_village}' not registered in Sinnar taluka registry.",
+            "message": f"Target village '{target_village}' not registered in Ahilyanagar or Sinnar disaster registries.",
             "is_geofence_valid": False,
             "escrow_status": "WITHHELD"
         }

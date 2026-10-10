@@ -93,5 +93,12 @@
   <script src="js/supabaseClient.js"></script>
   <script src="js/lang.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW register note:', err));
+      });
+    }
+  </script>
 </body>
 </html>

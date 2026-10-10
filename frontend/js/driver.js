@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // 1. Generate Encrypted Cryptographic Payload for Offline Handshake
   const payload = JSON.stringify({
-    tanker_id: "TN-04",
-    registration: "MH-15-AG-982",
-    target_village: "Khopadi",
+    tanker_id: "TN-SN-02",
+    registration: "MH-15-TK-5512",
+    target_village: "Khopadi (Sinnar)",
     volume_liters: 10000,
     timestamp: new Date().toISOString(),
     driver_key: "0x9F3B4ED812C4",
@@ -63,8 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Sync arrival to Supabase
           if (window.JalSupabase) {
-            window.JalSupabase.updateTankerLocation("TN-04", 19.90, 74.10, false, "arrived");
-            console.log("🌊 Driver arrival synced to Supabase for Tanker TN-04.");
+            window.JalSupabase.updateTankerLocation("TN-SN-02", 19.9015, 74.1030, false, "arrived");
+            window.JalSupabase.updateTankerLocation("TN-04", 19.9015, 74.1030, false, "arrived");
+            console.log("🌊 Driver arrival synced to Supabase for Tanker TN-SN-02.");
           }
         }, 800);
       } else {
@@ -90,7 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Reset status in Supabase
         if (window.JalSupabase) {
-          window.JalSupabase.updateTankerLocation("TN-04", 19.88, 74.02, false, "en_route");
+          window.JalSupabase.updateTankerLocation("TN-SN-02", 19.8920, 74.0610, false, "en_route");
+          window.JalSupabase.updateTankerLocation("TN-04", 19.8920, 74.0610, false, "en_route");
         }
       }
     });
