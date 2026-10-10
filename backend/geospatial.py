@@ -7,7 +7,8 @@ GRACE-FO groundwater anomalies) combined with Central Ground Water Board (CGWB) 
 import math
 import json
 import urllib.request
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+
 
 # Standard Taluka coordinates (Sinnar, Nashik, Maharashtra)
 SINNAR_COORDINATES = {
