@@ -67,18 +67,18 @@
       <!-- Key Taluka Status Metrics -->
       <div>
         <div class="panel-header">
-          <span class="panel-title">Taluka Sovereign Metrics (Sinnar)</span>
+          <span class="panel-title">Regional Drought Metrics (Ahilyanagar &amp; Sinnar)</span>
           <span class="badge-status critical" id="alertCounterBadge">1 Rogue Alert</span>
         </div>
         <div class="stat-grid">
           <div class="stat-box critical">
             <span class="stat-label">Villages Depleted</span>
-            <span class="stat-value" id="criticalVillageCount">2</span>
+            <span class="stat-value" id="criticalVillageCount">5</span>
             <span class="stat-sub">&lt; 24h statutory reserve</span>
           </div>
           <div class="stat-box warning">
             <span class="stat-label">Warning Zone</span>
-            <span class="stat-value">1</span>
+            <span class="stat-value">5</span>
             <span class="stat-sub">&lt; 7-day groundwater</span>
           </div>
           <div class="stat-box success">
@@ -105,7 +105,7 @@
             <span class="alert-time">Just now</span>
           </div>
           <p class="alert-desc">
-            <strong>Tanker #07 (MH-15-TK-889)</strong> deviated 12km off designated corridor towards private commercial quarry. Cistern GPS handshake missing.
+            <strong>Tanker #TN-ROGUE (MH-16-TX-9901)</strong> deviated 14km off designated corridor near Karjat. Private commercial diversion flagged.
           </p>
           <div style="display: flex; gap: 8px;">
             <button id="btnSuspendPayment" class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--alert-red); color: var(--alert-red);">Freeze Contractor Escrow</button>
@@ -169,7 +169,7 @@
       <div class="map-hud-top">
         <div class="hud-panel">
           <span class="hud-tag">Operational Sector</span>
-          <span class="hud-value">Sinnar Taluka • Nashik District (19.845° N, 74.000° E)</span>
+          <span class="hud-value">Ahilyanagar &amp; Sinnar Drought Corridor • Maharashtra (19.25° N, 74.65° E)</span>
         </div>
         <div class="hud-panel">
           <span class="hud-tag">Hydro-Telemetry Node</span>
@@ -181,6 +181,14 @@
             <button id="toggleVillages" class="layer-pill active" title="Toggle village markers">🏘️ Hamlets</button>
             <button id="toggleFleet" class="layer-pill active" title="Toggle tanker fleet markers">🚛 Fleet GPS</button>
             <button id="toggleRogue" class="layer-pill active" title="Toggle diversion alerts">⚠️ Anomalies</button>
+          </div>
+        </div>
+        <div class="hud-panel basemap-control-panel">
+          <span class="hud-tag">Basemap View</span>
+          <div class="hud-layer-btns">
+            <button id="btnSatellite" class="layer-pill active" title="Switch to High-Res Satellite View">🛰️ Satellite View</button>
+            <button id="btnDarkCanvas" class="layer-pill" title="Switch to Dark Tactical Mode">🗺️ Tactical Dark</button>
+            <button id="btnTerrain" class="layer-pill" title="Switch to Topo Terrain">🏔️ Terrain</button>
           </div>
         </div>
       </div>
