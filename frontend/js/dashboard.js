@@ -394,7 +394,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         const t = data.telemetry;
         if (badge && t) {
-          badge.innerHTML = `Sentinel-2: <span style="color:#00e5ff; font-weight:700;">MNDWI -0.45</span> | Moisture: <span style="color:#f59e0b; font-weight:700;">${t.root_zone_soil_moisture_m3_m3}</span>`;
+          const aquiferText = t.aquifer_storage_anomaly_cm !== undefined 
+            ? ` | Aquifer: <span style="color:#ef4444; font-weight:700;">${t.aquifer_storage_anomaly_cm}cm</span>` 
+            : '';
+          badge.innerHTML = `NASA SMAP: <span style="color:#f59e0b; font-weight:700;">${t.root_zone_soil_moisture_m3_m3} m³/m³</span>${aquiferText} | Stress: <span style="color:${t.status === 'CRITICAL_DEFICIT' ? '#ef4444' : '#10b981'}; font-weight:700;">${t.drought_stress_index}/100</span>`;
           console.log("🛰️ [JalSanjeevani] Live Satellite & Soil Moisture Telemetry Connected:", data);
         }
       }
