@@ -8,6 +8,8 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/mobile.css">
+  <script src="js/html5-qrcode.min.js"></script>
+  <script>if (typeof Html5Qrcode === 'undefined') { document.write('<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"><\/script>'); }</script>
 </head>
 <body class="mobile-layout">
 
@@ -53,7 +55,7 @@
       </div>
       <div class="detail-row">
         <span>Incoming Authorized Drop</span>
-        <span id="incomingDropText" style="color: var(--primary-color);">+10,000 L (Tanker #04)</span>
+        <span id="incomingDropText" style="color: var(--primary-color);">+10,000 L (Tanker TN-SN-02)</span>
       </div>
       <div class="detail-row">
         <span>Beneficiaries</span>
@@ -68,33 +70,68 @@
 
     <!-- Camera Viewfinder -->
     <div class="scanner-window" id="scannerWindow">
-      <div class="scanner-line"></div>
-      <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1rem;">
-        <span style="font-size: 2rem; display: block; margin-bottom: 6px;">📷</span>
-        <span>Camera Active • Awaiting Driver QR</span>
+      <!-- QR Reader Video Stream Target -->
+      <div id="qrReader" style="width: 100%; display: none;"></div>
+
+      <!-- Animated Scanning Line -->
+      <div id="scannerLaser" class="scanner-line" style="display: none;"></div>
+
+      <!-- Idle Placeholder -->
+      <div id="scannerPlaceholder" style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+        <span style="font-size: 2.2rem; display: block;">📷</span>
+        <span id="scannerStatusPrompt" style="font-weight: 600; color: var(--text-primary);">Camera Ready</span>
+        <span style="font-size: 0.72rem; color: var(--text-dim); max-width: 220px; line-height: 1.3;">
+          Tap below to start live camera scanning or upload a QR image
+        </span>
       </div>
     </div>
 
-    <!-- Scan Trigger Button -->
-    <button id="btnSimulateScan" class="btn btn-primary btn-block">
-      Scan Driver's Cryptographic QR
-    </button>
+    <!-- Live Scanning Status / Error Feedback -->
+    <div id="scanFeedback" style="display: none; margin-top: 8px; padding: 6px 12px; border-radius: 8px; font-size: 0.76rem; text-align: center; font-family: var(--font-mono); background: rgba(0,0,0,0.5); border: 1px solid var(--border-color);">
+    </div>
+
+    <!-- Scanner Action Controls -->
+    <div id="scannerControlsArea" style="margin-top: 10px;">
+      <button id="btnToggleCamera" class="btn btn-primary btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span id="cameraBtnIcon">📷</span>
+        <span id="cameraBtnText">Open Live Camera Scan</span>
+      </button>
+
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button id="btnUploadQR" class="btn btn-outline btn-sm" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 0.75rem;">
+          <span>📁</span> <span>Upload QR Image</span>
+        </button>
+        <input type="file" id="qrFileInput" accept="image/*" style="display: none;" />
+
+        <button id="btnInstantDemo" class="btn btn-outline btn-sm" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 0.75rem; border-color: rgba(16, 185, 129, 0.4); color: var(--telemetry-emerald);">
+          <span>⚡</span> <span>1-Tap Test Demo</span>
+        </button>
+      </div>
+    </div>
 
     <!-- Verified Handshake Result Box -->
     <div id="statusBox" class="status-box">
       <strong>✓ DUAL-KEY CRYPTOGRAPHIC HANDSHAKE VERIFIED</strong>
       <div style="font-size: 0.8rem; text-align: left; margin-top: 10px; line-height: 1.6; color: var(--text-secondary);">
-        <p><strong>Tanker ID:</strong> TN-04 (MH-15-AG-982)</p>
-        <p><strong>Driver Key:</strong> <span class="font-mono">0x9F3B4ED812C4</span></p>
-        <p><strong>Cistern Geokey:</strong> <span class="font-mono">0x74CE8A1109B2</span></p>
-        <p><strong>Discharge Volume:</strong> 10,000 Liters</p>
+        <p><strong>Tanker ID:</strong> <span id="verifiedTankerId">TN-SN-02 (MH-15-TK-5512)</span></p>
+        <p><strong>Target Village:</strong> <span id="verifiedVillage">Khopadi (Sinnar)</span></p>
+        <p><strong>Driver Key:</strong> <span id="verifiedDriverKey" class="font-mono">0x9F3B4ED812C4</span></p>
+        <p><strong>Cistern Geokey:</strong> <span id="verifiedCisternKey" class="font-mono">0x74CE8A1109B2</span></p>
+        <p><strong>Discharge Volume:</strong> <span id="verifiedVolume">10,000 Liters</span></p>
+        <p><strong>Geofence Perimeter:</strong> <span id="verifiedGeofence" style="color: var(--telemetry-emerald);">✓ Inside Cistern Perimeter (12m)</span></p>
         <p style="color: var(--telemetry-emerald); font-weight: 600; margin-top: 4px;">
           ✓ New Cistern Reserve: 12,000 Liters (48% Safe)
         </p>
-        <p style="font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
-          Signed receipt stored offline in IndexedDB • Escrow released to contractor
-        </p>
+        <p><strong>Escrow Status:</strong> <span id="verifiedEscrow" style="color: var(--telemetry-emerald); font-weight: 600;">RELEASED ✓ (Direct DBT Authorized)</span></p>
+        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
+          <div>Signature: <span id="verifiedSignature" class="font-mono">SHA256:8f4c2e1b9a7d3c5e</span></div>
+          <div>Timestamp: <span id="verifiedTimestamp"></span></div>
+          <div style="margin-top: 2px;">Receipt stored offline &amp; synced with Supabase PostgreSQL</div>
+        </div>
       </div>
+      <button id="btnResetScan" class="btn btn-outline btn-sm" style="margin-top: 12px; width: 100%; font-size: 0.75rem;">
+        ↺ Scan Another Tanker / Reset
+      </button>
     </div>
 
   </main>

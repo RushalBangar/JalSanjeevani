@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jalsanjeevani-cache-v3';
+const CACHE_NAME = 'jalsanjeevani-cache-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -17,6 +17,8 @@ const ASSETS_TO_CACHE = [
   './js/dashboard.js',
   './js/supabaseClient.js',
   './js/lang.js',
+  './js/html5-qrcode.min.js',
+  './js/qrcode.min.js',
   './assets/favicon.svg',
   './assets/logo.jpg'
 ];

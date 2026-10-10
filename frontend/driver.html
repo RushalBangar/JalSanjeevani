@@ -8,7 +8,8 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/mobile.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
+  <script>if (typeof QRCode === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>'); }</script>
 </head>
 <body class="mobile-layout">
 
@@ -37,7 +38,7 @@
     <div class="manifest-card glass-panel">
       <h3>
         <span>Target: Khopadi Cistern</span>
-        <span style="font-size: 0.75rem; color: var(--telemetry-emerald);">● IN TRANSIT</span>
+        <span id="transitBadge" style="font-size: 0.75rem; color: var(--telemetry-emerald);">● IN TRANSIT</span>
       </h3>
       <div class="detail-row">
         <span>Load Volume</span>
@@ -78,7 +79,25 @@
         <div id="qrcode"></div>
         <span class="crypto-hash" id="driverCryptoKey">KEY: 0x9F3B4E • GEOFENCE ENCRYPTED</span>
       </div>
+
+      <!-- Quick Action Controls for Driver & Verification -->
+      <div style="display: flex; gap: 6px; margin-top: 12px;">
+        <button id="btnCopyPayload" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
+          📋 Copy Token
+        </button>
+        <button id="btnDownloadQR" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
+          💾 Save Image
+        </button>
+        <button id="btnTogglePayload" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.72rem; padding: 6px 4px;">
+          🔍 View JSON
+        </button>
+      </div>
+
+      <pre id="payloadJsonView" class="payload-preview" style="display: none;"></pre>
     </div>
+
+    <!-- Toast Notification for Driver Actions -->
+    <div id="driverToast" style="display: none; position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #10b981; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-weight: 500;"></div>
 
   </main>
 
