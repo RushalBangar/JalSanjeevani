@@ -108,13 +108,17 @@ class ScarcityPredictRequest(BaseModel):
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint providing API and Supabase database status."""
+    """Health check endpoint providing API, Supabase, and Google Earth Engine status."""
+    from geospatial import _EE_INITIALIZED, _EE_INIT_ERROR, init_earth_engine
+    init_earth_engine()
     return {
         "status": "online",
         "service": "JalSanjeevani Logistics & Anti-Diversion Engine",
         "version": "2.0.0",
         "supabase_connected": supabase_client is not None,
-        "database_url": SUPABASE_URL
+        "database_url": SUPABASE_URL,
+        "google_earth_engine_connected": _EE_INITIALIZED,
+        "google_earth_engine_notice": _EE_INIT_ERROR
     }
 
 @app.get("/api/satellite/telemetry")

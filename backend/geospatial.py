@@ -127,13 +127,133 @@ def get_regional_satellite_telemetry() -> Dict[str, Any]:
         }
     }
 
+import os
+
+# Earth Engine initialization state
+_EE_INITIALIZED = False
+_EE_INIT_ERROR = None
+
+def init_earth_engine() -> bool:
+    """
+    Initializes Google Earth Engine using Service Account credentials.
+    Supports either:
+    1. GCP_SERVICE_ACCOUNT_JSON (raw JSON string in environment variable, useful for Render)
+    2. service_account.json (file in backend directory)
+    """
+    global _EE_INITIALIZED, _EE_INIT_ERROR
+    if _EE_INITIALIZED:
+        return True
+
+    try:
+        import ee
+        from google.oauth2 import service_account
+
+        project_id = os.getenv("GCP_PROJECT_ID", "jalsanjeevani")
+        sa_json_str = os.getenv("GCP_SERVICE_ACCOUNT_JSON")
+        sa_file = os.getenv("GCP_SERVICE_ACCOUNT_FILE", "service_account.json")
+
+        creds = None
+        if sa_json_str:
+            sa_info = json.loads(sa_json_str)
+            creds = service_account.Credentials.from_service_account_info(
+                sa_info,
+                scopes=["https://www.googleapis.com/auth/earthengine", "https://www.googleapis.com/auth/cloud-platform"]
+            )
+        else:
+            search_paths = [
+                sa_file,
+                os.path.join(os.path.dirname(__file__), sa_file),
+                os.path.join(os.getcwd(), sa_file),
+                os.path.join(os.getcwd(), "backend", sa_file)
+            ]
+            for p in search_paths:
+                if os.path.exists(p):
+                    creds = service_account.Credentials.from_service_account_file(
+                        p,
+                        scopes=["https://www.googleapis.com/auth/earthengine", "https://www.googleapis.com/auth/cloud-platform"]
+                    )
+                    break
+
+        if not creds:
+            _EE_INIT_ERROR = "No service account credentials found. Set GCP_SERVICE_ACCOUNT_JSON on Render or place service_account.json in backend."
+            return False
+
+        ee.Initialize(creds, project=project_id)
+        _EE_INITIALIZED = True
+        _EE_INIT_ERROR = None
+        print(f"[JalSanjeevani] Google Earth Engine initialized successfully on project '{project_id}'.")
+        return True
+    except Exception as e:
+        _EE_INIT_ERROR = str(e)
+        print(f"[JalSanjeevani] Google Earth Engine initialization notice: {e}")
+        return False
+
+def fetch_earth_engine_telemetry(lat: float, lng: float, district_name: str = "Ahilyanagar") -> Optional[Dict[str, Any]]:
+    """
+    Directly queries Google Earth Engine for NASA SMAP & NASA GRACE-FO telemetry.
+    """
+    if not init_earth_engine():
+        return None
+
+    try:
+        import ee
+        pt = ee.Geometry.Point([lng, lat])
+
+        # 1. NASA SMAP (Root Zone Soil Moisture)
+        smap_col = ee.ImageCollection('NASA/SMAP/SPL4SMGP/007').select('sm_rootzone')
+        latest_smap = smap_col.sort('system:time_start', False).first()
+        smap_dict = latest_smap.reduceRegion(
+            reducer=ee.Reducer.mean(),
+            geometry=pt.buffer(5000),
+            scale=11000
+        ).getInfo()
+
+        # 2. NASA GRACE-FO (Aquifer Anomaly cm)
+        grace_col = ee.ImageCollection('NASA/GRACE/MASS_GRIDS_V04/MASCON_CRI').select('lwe_thickness')
+        latest_grace = grace_col.sort('system:time_start', False).first()
+        grace_dict = latest_grace.reduceRegion(
+            reducer=ee.Reducer.mean(),
+            geometry=pt.buffer(25000),
+            scale=25000
+        ).getInfo()
+
+        root_moisture = float(smap_dict.get('sm_rootzone', 0.16) or 0.16)
+        aquifer_anomaly = float(grace_dict.get('lwe_thickness', -6.5) or -6.5)
+
+        # Calculate drought stress index (0 - 100)
+        moisture_stress = max(0.0, min(100.0, (1.0 - (root_moisture / 0.35)) * 60.0))
+        aquifer_stress = max(0.0, min(100.0, (abs(min(0.0, aquifer_anomaly)) / 15.0) * 40.0))
+        stress_score = round(moisture_stress + aquifer_stress, 1)
+
+        status = "CRITICAL_DEFICIT" if stress_score >= 70.0 else "WARNING_DEFICIT" if stress_score >= 40.0 else "NORMAL"
+
+        return {
+            "district": district_name,
+            "coordinates": [lat, lng],
+            "data_source": "Google Earth Engine (NASA SMAP & GRACE-FO)",
+            "telemetry": {
+                "root_zone_soil_moisture_m3_m3": round(root_moisture, 3),
+                "aquifer_storage_anomaly_cm": round(aquifer_anomaly, 2),
+                "drought_stress_index": stress_score,
+                "status": status,
+                "14_day_emergency_trigger": stress_score >= 65.0
+            }
+        }
+    except Exception as e:
+        print(f"[JalSanjeevani] Earth Engine query error: {e}")
+        return None
+
 def fetch_live_satellite_data(lat: float = 19.0952, lng: float = 74.7496, district_name: str = "Ahilyanagar") -> Dict[str, Any]:
     """
     Direct Live Satellite API:
-    Queries real-time European Earth Observation Land Assimilation data
-    (Copernicus ERA5-Land & Satellite Radiometry) for Ahilyanagar / Sinnar.
-    No API key required - returns direct numerical JSON.
+    1. First attempts Google Earth Engine (NASA SMAP & GRACE-FO) using Service Account
+    2. Falls back gracefully to Copernicus ERA5-Land real-time telemetry if EE credentials / IAM permissions are pending.
     """
+    ee_data = fetch_earth_engine_telemetry(lat=lat, lng=lng, district_name=district_name)
+    if ee_data:
+        return ee_data
+
+    # Copernicus open telemetry fallback
     url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=soil_moisture_0_to_1cm,soil_moisture_9_to_27cm&daily=et0_fao_evapotranspiration,precipitation_sum&timezone=Asia%2FKolkata&forecast_days=3"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'JalSanjeevani-Satellite/1.0'})
@@ -179,4 +299,5 @@ def fetch_live_satellite_data(lat: float = 19.0952, lng: float = 74.7496, distri
                 "14_day_emergency_trigger": True
             }
         }
+
 

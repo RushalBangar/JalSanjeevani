@@ -5,3 +5,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+*.json.secret
+*service_account*.json
+*service-account*.json
+
