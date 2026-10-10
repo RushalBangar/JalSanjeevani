@@ -749,20 +749,121 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
-  // 8. Mobile Sidebar Toggle
-  const btnToggleSidebar = document.getElementById("btnToggleSidebar");
-  const dashSidebar = document.getElementById("dashSidebar");
+  // 8. Mobile Responsive Drawer & Navigation Controllers
+  const tacticalSidebar = document.getElementById("tacticalSidebar");
+  const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+  const btnOpenMobileSidebar = document.getElementById("btnMobileSidebarToggle");
+  const btnCloseMobileSidebar = document.getElementById("btnCloseMobileSidebar");
 
-  if (btnToggleSidebar && dashSidebar) {
-    btnToggleSidebar.addEventListener("click", () => {
-      dashSidebar.classList.toggle("mobile-open");
-      if (dashSidebar.classList.contains("mobile-open")) {
-        btnToggleSidebar.textContent = "🗺️ Close & View Map";
-      } else {
-        btnToggleSidebar.textContent = "📋 View Telemetry & Controls";
-      }
-    });
+  function openMobileSidebar() {
+    if (!tacticalSidebar) return;
+    tacticalSidebar.classList.remove("-translate-x-full");
+    tacticalSidebar.classList.add("translate-x-0");
+    if (sidebarBackdrop) sidebarBackdrop.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
   }
+
+  function closeMobileSidebar() {
+    if (!tacticalSidebar) return;
+    tacticalSidebar.classList.add("-translate-x-full");
+    tacticalSidebar.classList.remove("translate-x-0");
+    if (sidebarBackdrop) sidebarBackdrop.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  btnOpenMobileSidebar?.addEventListener("click", openMobileSidebar);
+  btnCloseMobileSidebar?.addEventListener("click", closeMobileSidebar);
+  sidebarBackdrop?.addEventListener("click", closeMobileSidebar);
+
+  // Close sidebar drawer when clicking any link inside it on mobile
+  tacticalSidebar?.querySelectorAll(".sidebar-nav-link")?.forEach(link => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth < 1024) closeMobileSidebar();
+    });
+  });
+
+  // 9. Mobile View Switcher (Satellite Map vs Alerts & Hamlets Dock)
+  const btnMobileViewMap = document.getElementById("btnMobileViewMap");
+  const btnMobileViewDock = document.getElementById("btnMobileViewDock");
+  const mapSection = document.getElementById("mapSection");
+  const dockSection = document.getElementById("dockSection");
+
+  function switchMobileView(view) {
+    if (view === "map") {
+      btnMobileViewMap?.classList.add("bg-primary-container", "text-on-primary-container", "font-bold", "shadow-md");
+      btnMobileViewMap?.classList.remove("text-on-surface-variant", "font-medium");
+      btnMobileViewDock?.classList.remove("bg-primary-container", "text-on-primary-container", "font-bold", "shadow-md");
+      btnMobileViewDock?.classList.add("text-on-surface-variant", "font-medium");
+
+      if (window.innerWidth < 1280) {
+        mapSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => map.invalidateSize(), 300);
+      }
+    } else {
+      btnMobileViewDock?.classList.add("bg-primary-container", "text-on-primary-container", "font-bold", "shadow-md");
+      btnMobileViewDock?.classList.remove("text-on-surface-variant", "font-medium");
+      btnMobileViewMap?.classList.remove("bg-primary-container", "text-on-primary-container", "font-bold", "shadow-md");
+      btnMobileViewMap?.classList.add("text-on-surface-variant", "font-medium");
+
+      if (window.innerWidth < 1280) {
+        dockSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
+
+  btnMobileViewMap?.addEventListener("click", () => switchMobileView("map"));
+  btnMobileViewDock?.addEventListener("click", () => switchMobileView("dock"));
+
+  // 10. Mobile Collapsible Legend
+  const btnToggleLegendMobile = document.getElementById("btnToggleLegendMobile");
+  const legendBody = document.getElementById("legendBody");
+  const legendChevron = document.getElementById("legendChevron");
+
+  btnToggleLegendMobile?.addEventListener("click", () => {
+    if (!legendBody) return;
+    const isHidden = legendBody.classList.contains("hidden");
+    if (isHidden) {
+      legendBody.classList.remove("hidden");
+      legendBody.classList.add("flex");
+      if (legendChevron) legendChevron.textContent = "expand_less";
+    } else {
+      legendBody.classList.remove("flex");
+      legendBody.classList.add("hidden");
+      if (legendChevron) legendChevron.textContent = "expand_more";
+    }
+  });
+
+  // 11. Mobile Bottom Navigation Bar Actions
+  document.getElementById("navMobileMap")?.addEventListener("click", () => {
+    switchMobileView("map");
+    mapSection?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => map.invalidateSize(), 200);
+  });
+
+  document.getElementById("navMobileAnomaly")?.addEventListener("click", () => {
+    switchMobileView("dock");
+    document.getElementById("anomaly-section")?.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("navMobileDispatch")?.addEventListener("click", () => {
+    switchMobileView("dock");
+    document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("navMobileHamlets")?.addEventListener("click", () => {
+    switchMobileView("dock");
+    document.getElementById("cistern-section")?.scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("navMobileMenu")?.addEventListener("click", openMobileSidebar);
+
+  // Resize listener to ensure Leaflet renders tiles sharply
+  window.addEventListener("resize", () => {
+    map.invalidateSize();
+    if (window.innerWidth >= 1024) {
+      closeMobileSidebar();
+    }
+  });
 });
 
 // Pulse animation for Rogue Tanker Marker
