@@ -357,6 +357,8 @@ document.addEventListener("DOMContentLoaded", () => {
           renderVillageMarkers();
           renderVillageList();
         }
+      });
+
       // 5. Realtime listener: Live Delivery QR Verifications
       window.JalSupabase.subscribeToReceipts((payload) => {
         const record = payload.new;
