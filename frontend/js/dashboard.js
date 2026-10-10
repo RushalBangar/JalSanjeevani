@@ -19,8 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomControl: false
   }).setView(MAP_CENTER, MAP_ZOOM);
 
-  // Add Zoom control to top right
-  L.control.zoom({ position: 'topright' }).addTo(map);
+  // Wire custom tactical HUD zoom buttons
+  document.getElementById("btnZoomIn")?.addEventListener("click", () => map.zoomIn());
+  document.getElementById("btnZoomOut")?.addEventListener("click", () => map.zoomOut());
 
   // --- BASEMAP CONFIGURATION ---
   // A. High-Resolution True Satellite Imagery (Esri World Imagery + Hybrid Reference Labels)
@@ -167,35 +168,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
     villageListContainer.innerHTML = filtered.map(v => {
       let totalLiters = (v.population * 40 + v.cattle * 70).toLocaleString();
+      const badgeClass = v.status === "critical"
+        ? "bg-error-container text-on-error-container"
+        : v.status === "warning"
+        ? "bg-warning-amber/10 text-warning-amber"
+        : "bg-tertiary/10 text-tertiary";
+      const cisternColor = v.status === "critical"
+        ? "text-alert-crimson font-bold"
+        : v.status === "warning"
+        ? "text-warning-amber font-bold"
+        : "text-tertiary font-bold";
+      const timeColor = v.status === "critical"
+        ? "text-error font-semibold"
+        : v.status === "warning"
+        ? "text-warning-amber font-semibold"
+        : "text-tertiary font-semibold";
+      const reserveLabel = (v.hours_remaining !== undefined && v.hours_remaining < 24)
+        ? `T-${v.hours_remaining}h Deplete`
+        : `T-${Math.max(1, Math.round((v.hours_remaining || 48)/24))}d Reserve`;
+
       return `
-        <div class="village-item" data-id="${v.id}">
-          <div class="village-meta">
-            <span class="village-name">${v.name}</span>
-            <span class="village-demand">Req: ${totalLiters} L/day • Cistern ${v.cistern_level}</span>
+        <div class="village-card group p-space-sm rounded-lg bg-surface-card hover:bg-surface-container transition-all flex items-center justify-between cursor-pointer border border-border-subtle" data-id="${v.id}">
+          <div class="flex flex-col gap-0.5">
+            <div class="flex items-center gap-space-xs">
+              <span class="font-headline-md text-body-lg font-bold text-on-surface">${v.name}</span>
+              <span class="px-1.5 py-0.2 rounded-DEFAULT ${badgeClass} font-label-tactical text-[9px] uppercase font-bold">${v.status}</span>
+            </div>
+            <div class="font-telemetry-code text-body-sm text-on-surface-variant">
+              Req: <span class="text-on-surface">${totalLiters} L/day</span> • Cistern <span class="${cisternColor}">${v.cistern_level}</span>
+            </div>
           </div>
-          <span class="badge-status ${v.status}">${v.status}</span>
+          <div class="flex flex-col items-end gap-1">
+            <span class="font-telemetry-code text-body-sm ${timeColor}">${reserveLabel}</span>
+            <span class="material-symbols-outlined text-outline group-hover:text-primary transition-all text-[18px]">chevron_right</span>
+          </div>
         </div>
       `;
     }).join("");
 
     // Re-bind click event to fly to marker
-    villageListContainer.querySelectorAll(".village-item").forEach(item => {
+    villageListContainer.querySelectorAll(".village-card").forEach(item => {
       item.addEventListener("click", () => {
         const id = item.getAttribute("data-id");
-        villageListContainer.querySelectorAll(".village-item").forEach(el => el.classList.remove("active"));
-        item.classList.add("active");
+        villageListContainer.querySelectorAll(".village-card").forEach(el => el.classList.remove("border-primary", "bg-surface-container"));
+        item.classList.add("border-primary", "bg-surface-container");
 
         if (markersMap[id]) {
           map.flyTo(markersMap[id].coords, 13, { duration: 1.2 });
           markersMap[id].circle.openPopup();
-        }
-
-        // On mobile, close sidebar after clicking so map is immediately visible
-        const dashSidebar = document.getElementById("dashSidebar");
-        const btnToggleSidebar = document.getElementById("btnToggleSidebar");
-        if (window.innerWidth < 900 && dashSidebar && dashSidebar.classList.contains("mobile-open")) {
-          dashSidebar.classList.remove("mobile-open");
-          if (btnToggleSidebar) btnToggleSidebar.textContent = "📋 View Telemetry & Controls";
         }
       });
     });
@@ -209,12 +229,16 @@ document.addEventListener("DOMContentLoaded", () => {
     renderVillageList();
   });
 
-  // Filter pills handler
-  filterPillsContainer?.querySelectorAll(".filter-pill").forEach(pill => {
-    pill.addEventListener("click", () => {
-      filterPillsContainer.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
-      pill.classList.add("active");
-      currentFilter = pill.getAttribute("data-filter") || "all";
+  // Filter chips handler
+  filterPillsContainer?.querySelectorAll(".filter-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      filterPillsContainer.querySelectorAll(".filter-chip").forEach(c => {
+        c.classList.remove("bg-primary-container", "text-on-primary-container", "font-bold", "active");
+        c.classList.add("bg-surface-container", "text-on-surface-variant");
+      });
+      chip.classList.add("bg-primary-container", "text-on-primary-container", "font-bold", "active");
+      chip.classList.remove("bg-surface-container", "text-on-surface-variant");
+      currentFilter = chip.getAttribute("data-filter") || "all";
       renderVillageList();
     });
   });
@@ -454,8 +478,12 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleVillages.classList.toggle("active");
     if (toggleVillages.classList.contains("active")) {
       map.addLayer(villageLayer);
+      toggleVillages.classList.add("bg-primary-container", "text-on-primary-container");
+      toggleVillages.classList.remove("bg-surface-container", "text-on-surface-variant");
     } else {
       map.removeLayer(villageLayer);
+      toggleVillages.classList.remove("bg-primary-container", "text-on-primary-container");
+      toggleVillages.classList.add("bg-surface-container", "text-on-surface-variant");
     }
   });
 
@@ -463,8 +491,12 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleFleet.classList.toggle("active");
     if (toggleFleet.classList.contains("active")) {
       map.addLayer(fleetLayer);
+      toggleFleet.classList.add("bg-primary-container", "text-on-primary-container");
+      toggleFleet.classList.remove("bg-surface-container", "text-on-surface-variant");
     } else {
       map.removeLayer(fleetLayer);
+      toggleFleet.classList.remove("bg-primary-container", "text-on-primary-container");
+      toggleFleet.classList.add("bg-surface-container", "text-on-surface-variant");
     }
   });
 
@@ -472,8 +504,12 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleRogue.classList.toggle("active");
     if (toggleRogue.classList.contains("active")) {
       map.addLayer(rogueLayer);
+      toggleRogue.classList.add("bg-error-container", "text-on-error-container");
+      toggleRogue.classList.remove("bg-surface-container", "text-on-surface-variant");
     } else {
       map.removeLayer(rogueLayer);
+      toggleRogue.classList.remove("bg-error-container", "text-on-error-container");
+      toggleRogue.classList.add("bg-surface-container", "text-on-surface-variant");
     }
   });
 
@@ -487,8 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (map.hasLayer(g)) map.removeLayer(g);
     });
     activeGroup.addTo(map);
-    [btnSatellite, btnDarkCanvas, btnTerrain].forEach(btn => btn?.classList.remove("active"));
-    activeBtn?.classList.add("active");
+    [btnSatellite, btnDarkCanvas, btnTerrain].forEach(btn => {
+      btn?.classList.remove("bg-primary-container", "text-on-primary-container", "active");
+      btn?.classList.add("bg-surface-container", "text-on-surface-variant");
+    });
+    activeBtn?.classList.add("bg-primary-container", "text-on-primary-container", "active");
+    activeBtn?.classList.remove("bg-surface-container", "text-on-surface-variant");
   }
 
   btnSatellite?.addEventListener("click", () => setBasemap(btnSatellite, satelliteGroup));
@@ -515,8 +555,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btnSuspend.addEventListener("click", () => {
       btnSuspend.textContent = "Contractor Escrow Frozen ✓";
       btnSuspend.disabled = true;
-      btnSuspend.style.background = "rgba(239, 68, 68, 0.2)";
-      btnSuspend.style.color = "#ff8080";
+      btnSuspend.classList.remove("bg-alert-crimson", "hover:bg-error");
+      btnSuspend.classList.add("bg-surface-container-high", "text-outline", "cursor-not-allowed");
       
       if (alertCard) {
         alertCard.style.borderColor = "rgba(16, 185, 129, 0.4)";
@@ -529,8 +569,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       if (alertBadge) {
-        alertBadge.className = "badge-status safe";
-        alertBadge.textContent = "Escrow Frozen";
+        alertBadge.className = "flex items-center gap-space-xs px-space-sm py-1 rounded-lg bg-safe-emerald/20 text-safe-emerald font-label-tactical text-label-tactical uppercase font-bold";
+        alertBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-safe-emerald"></span><span>Escrow Frozen</span>`;
+      }
+
+      const escrowPill = document.getElementById("escrow-status-pill");
+      if (escrowPill) {
+        escrowPill.textContent = "Escrow: FROZEN (Tx#894F)";
+        escrowPill.classList.remove("text-warning-amber");
+        escrowPill.classList.add("text-error", "font-bold");
       }
 
       rogueTanker.setPopupContent("<b>ALERT: Tanker #TN-ROGUE (MH-16-TX-9901)</b><br><span style='color:#ef4444; font-weight:bold;'>PAYMENT FROZEN & IMPOUND ORDERED (SUPABASE LOGGED)</span>");
@@ -656,13 +703,19 @@ document.addEventListener("DOMContentLoaded", () => {
         map.fitBounds(group.getBounds().pad(0.18), { duration: 1.2 });
       }
 
-      btnAllocate.innerHTML = "Dispatch Live (OR-Tools Active) ✓";
-      btnAllocate.style.background = "linear-gradient(135deg, #10b981, #059669)";
-      btnAllocate.style.color = "#ffffff";
+      btnAllocate.innerHTML = '<span class="material-symbols-outlined text-[18px]">done_all</span><span>Dispatches Transmitted ✓</span>';
+      btnAllocate.classList.remove("bg-primary-container");
+      btnAllocate.classList.add("bg-safe-emerald");
       btnAllocate.style.opacity = "1";
 
+      const solverResultText = document.getElementById("solverResultText");
+      if (solverResultText) {
+        const count = generatedRouteData ? generatedRouteData.length : 2;
+        solverResultText.innerHTML = `${count} Circuits Dispatched • 100% Demand Met • <span class="text-tertiary font-bold">-28.4% Diesel Burn</span>`;
+      }
+
       if (solverResultBox) {
-        solverResultBox.style.display = "block";
+        solverResultBox.style.display = "flex";
       }
 
       // Record Dispatch in Supabase

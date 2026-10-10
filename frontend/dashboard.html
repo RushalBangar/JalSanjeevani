@@ -1,220 +1,638 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Collector Command Dashboard | JalSanjeevani</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>JalSanjeevani | Tactical Command Center • Ahilyanagar & Sinnar</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  
-  <!-- Leaflet CSS for Maps -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Leaflet CSS for Photorealistic GIS Map Engine -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-  
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* Custom Leaflet HUD Popup & Controls Styling */
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: rgba(17, 26, 46, 0.95) !important;
+      color: #dde2f5 !important;
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(76, 215, 246, 0.3) !important;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+      border-radius: 8px !important;
+    }
+    .leaflet-container {
+      font-family: 'Inter', sans-serif !important;
+      background: #080e1b !important;
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px !important;
+      line-height: 1.5;
+    }
+    .leaflet-popup-close-button {
+      color: #869397 !important;
+    }
+    .leaflet-popup-close-button:hover {
+      color: #4cd7f6 !important;
+    }
+    .filter-chip.active, .layer-toggle-btn.active, .basemap-btn.active {
+      background-color: #06b6d4 !important;
+      color: #00424f !important;
+      font-weight: 700 !important;
+    }
+  </style>
+
+  <!-- Tailwind CSS Play CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-base": "#0B111E",
+            "surface-panel": "#111A2E",
+            "surface-card": "#17233D",
+            "surface-container": "#1a1f2d",
+            "surface-container-low": "#161b29",
+            "surface-container-high": "#242a38",
+            "surface-container-highest": "#2f3543",
+            "surface-container-lowest": "#080e1b",
+            "primary": "#4cd7f6",
+            "primary-container": "#06b6d4",
+            "on-primary": "#003640",
+            "on-primary-container": "#00424f",
+            "secondary": "#7bd0ff",
+            "secondary-container": "#00a6e0",
+            "tertiary": "#4edea3",
+            "safe-emerald": "#10B981",
+            "safe-emerald-glow": "rgba(16, 185, 129, 0.2)",
+            "warning-amber": "#F59E0B",
+            "warning-amber-glow": "rgba(245, 158, 11, 0.2)",
+            "alert-crimson": "#EF4444",
+            "alert-crimson-glow": "rgba(239, 68, 68, 0.2)",
+            "error": "#ffb4ab",
+            "error-container": "#93000a",
+            "on-error-container": "#ffdad6",
+            "on-surface": "#dde2f5",
+            "on-surface-variant": "#bcc9cd",
+            "outline": "#869397",
+            "border-subtle": "rgba(56, 189, 248, 0.14)",
+            "border-active": "rgba(6, 182, 212, 0.45)",
+            "telemetry-cyan-glow": "rgba(6, 182, 212, 0.2)"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          },
+          spacing: {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem",
+            "space-xl": "1.5rem",
+            "gutter": "0.75rem",
+            "gutter-desktop": "1rem"
+          },
+          fontFamily: {
+            "headline-xl": ["Inter"],
+            "headline-lg": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-tactical": ["JetBrains Mono"],
+            "telemetry-code": ["JetBrains Mono"],
+            "telemetry-metric": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "label-tactical": ["10px", { lineHeight: "12px", fontWeight: "600" }],
+            "telemetry-code": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+            "body-sm": ["11px", { lineHeight: "16px", fontWeight: "400" }],
+            "body-md": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+            "body-lg": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+            "headline-md": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+            "headline-lg": ["22px", { lineHeight: "28px", fontWeight: "600" }],
+            "telemetry-metric": ["28px", { lineHeight: "32px", fontWeight: "700" }]
+          }
+        }
+      }
+    };
+  </script>
 </head>
-<body>
+<body class="bg-surface-base font-body-md text-on-surface antialiased selection:bg-primary selection:text-on-primary">
 
-  <!-- Top Command Center Navigation -->
-  <nav class="dash-nav">
-    <div class="nav-brand">
-      <a href="index.html" style="display: flex; align-items: center; gap: 10px;">
-        <img src="assets/logo.jpg" alt="JalSanjeevani Logo">
-        <div class="brand-text">
-          <span class="brand-title">JalSanjeevani</span>
-          <span class="brand-sub">District Command Center</span>
-        </div>
-      </a>
-    </div>
-
-    <div class="nav-center">
-      <div class="nav-badge">
-        <span class="status-dot"></span>
-        <span id="satelliteTelemetryBadge">Copernicus Sentinel-2 (MNDWI -0.45): Active</span>
-        <span style="opacity: 0.4;">|</span>
-        <span id="liveClock" style="font-family: var(--font-mono); color: var(--primary-color);">UTC 00:00:00</span>
-        <span style="opacity: 0.4;">|</span>
-        <span id="supabaseStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #10b981;">
-          <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; display: inline-block;"></span>
-          Supabase DB Active
-        </span>
-      </div>
-
-      <!-- Quick Role / App Switcher -->
-      <div class="portal-tabs">
-        <a href="dashboard.html" class="portal-tab active">Collector Telemetry</a>
-        <a href="driver.html" class="portal-tab">Driver PWA</a>
-        <a href="panchayat.html" class="portal-tab">Panchayat Verify</a>
-        <a href="index.html" class="portal-tab">Public Portal</a>
-      </div>
-    </div>
-
-    <div class="nav-actions">
-      <select id="langSwitcher" class="lang-select-sm" aria-label="Language Selector">
-        <option value="en">English</option>
-        <option value="mr">मराठी</option>
-        <option value="hi">हिंदी</option>
-      </select>
-      <button class="btn btn-outline btn-sm" onclick="window.location.href='index.html'">Sign Out</button>
-    </div>
-  </nav>
-
-  <!-- Main Workspace -->
-  <div class="dash-container">
-    
-    <!-- Sidebar / Operational Controls -->
-    <aside class="sidebar glass-panel" id="dashSidebar">
+  <!-- TOP COMMAND BAR -->
+  <header class="fixed top-0 w-full z-50 bg-surface-panel/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)] border-b border-border-subtle">
+    <div class="h-14 w-full px-gutter-desktop flex items-center justify-between gap-space-md">
       
-      <!-- Key Taluka Status Metrics -->
-      <div>
-        <div class="panel-header">
-          <span class="panel-title">Regional Drought Metrics (Ahilyanagar &amp; Sinnar)</span>
-          <span class="badge-status critical" id="alertCounterBadge">1 Rogue Alert</span>
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-space-md flex-shrink-0">
+        <a href="index.html" class="flex items-center gap-space-sm">
+          <img alt="JalSanjeevani Logo" class="h-8 w-auto object-contain rounded-md" src="assets/logo.jpg"/>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-space-xs">
+              <span class="font-headline-md text-headline-md tracking-tight text-primary leading-none">JalSanjeevani</span>
+              <span class="px-space-xs py-0.5 rounded-DEFAULT bg-primary-container text-on-primary-container font-label-tactical text-label-tactical uppercase tracking-wider">Operational</span>
+            </div>
+            <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">District Command Center • Ahilyanagar &amp; Sinnar</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Telemetry Live Indicators -->
+      <div class="hidden 2xl:flex items-center gap-space-xs flex-shrink-0">
+        <!-- NASA SMAP -->
+        <div class="flex items-center gap-space-xs px-space-sm py-1 rounded-DEFAULT bg-surface-container-low" id="satelliteTelemetryBadge">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">NASA SMAP:</span>
+          <span class="font-telemetry-code text-telemetry-code text-on-surface font-semibold">0.318 m³/m³</span>
+          <span class="font-telemetry-code text-telemetry-code text-warning-amber">(Stress: 31.6/100)</span>
         </div>
-        <div class="stat-grid">
-          <div class="stat-box critical">
-            <span class="stat-label">Villages Depleted</span>
-            <span class="stat-value" id="criticalVillageCount">5</span>
-            <span class="stat-sub">&lt; 24h statutory reserve</span>
-          </div>
-          <div class="stat-box warning">
-            <span class="stat-label">Warning Zone</span>
-            <span class="stat-value">5</span>
-            <span class="stat-sub">&lt; 7-day groundwater</span>
-          </div>
-          <div class="stat-box success">
-            <span class="stat-label">Human Minimum</span>
-            <span class="stat-value">40L</span>
-            <span class="stat-sub">per capita / day guaranteed</span>
-          </div>
-          <div class="stat-box success">
-            <span class="stat-label">Cattle Quota</span>
-            <span class="stat-value">70L</span>
-            <span class="stat-sub">per head / day statutory</span>
-          </div>
+        <!-- Sentinel-2 -->
+        <div class="flex items-center gap-space-xs px-space-sm py-1 rounded-DEFAULT bg-surface-container-low">
+          <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          <span class="font-label-tactical text-label-tactical text-on-surface-variant uppercase">Sentinel-2:</span>
+          <span class="font-telemetry-code text-telemetry-code text-tertiary">MNDWI -0.45 [ACTV]</span>
+        </div>
+        <!-- UTC Clock -->
+        <div class="flex items-center gap-space-xs px-space-sm py-1 rounded-DEFAULT bg-surface-container-low">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-safe-emerald opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-safe-emerald"></span>
+          </span>
+          <span class="font-telemetry-code text-telemetry-code text-on-surface" id="liveClock">14:28:02 UTC</span>
+        </div>
+        <!-- Supabase Cloud Synced -->
+        <div class="flex items-center gap-space-xs px-space-sm py-1 rounded-DEFAULT bg-surface-container-low" id="supabaseStatusBadge">
+          <span class="w-1.5 h-1.5 rounded-full bg-safe-emerald"></span>
+          <span class="font-label-tactical text-label-tactical text-safe-emerald font-semibold uppercase">Supabase Synced</span>
         </div>
       </div>
 
-      <!-- Live Anti-Diversion Alert Feed -->
-      <div>
-        <div class="panel-header">
-          <span class="panel-title">Cryptographic Anti-Diversion Feed</span>
-        </div>
-        <div class="alert-card" id="diversionAlertCard">
-          <div class="alert-header">
-            <span class="badge-alert">DIVERSION ANOMALY</span>
-            <span class="alert-time">Just now</span>
-          </div>
-          <p class="alert-desc">
-            <strong>Tanker #TN-ROGUE (MH-16-TX-9901)</strong> deviated 14km off designated corridor near Karjat. Private commercial diversion flagged.
-          </p>
-          <div style="display: flex; gap: 8px;">
-            <button id="btnSuspendPayment" class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--alert-red); color: var(--alert-red);">Freeze Contractor Escrow</button>
-          </div>
-        </div>
-      </div>
+      <!-- Quick Portal / App Switcher -->
+      <nav class="flex items-center gap-space-xs">
+        <a aria-current="page" class="px-space-md py-1.5 transition-all bg-primary-container text-on-primary-container font-semibold rounded-lg shadow-sm" href="dashboard.html">Collector Telemetry</a>
+        <a class="px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" href="driver.html">Driver PWA</a>
+        <a class="px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" href="panchayat.html">Panchayat Verify</a>
+        <a class="px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" href="index.html">Public Portal</a>
+      </nav>
 
-      <!-- Village Distress Queue with Search & Filters -->
-      <div>
-        <div class="panel-header">
-          <span class="panel-title">Village Scarcity Matrix</span>
-          <span class="font-mono" style="font-size: 0.7rem; color: var(--text-dim);" id="matrixCounter">4 hamlets</span>
-        </div>
-        
-        <!-- Search and Filter Pills -->
-        <div class="matrix-filter-bar">
-          <input type="text" id="villageSearchInput" class="matrix-search" placeholder="Search village (e.g. Pangari)..." aria-label="Search village">
-          <div class="filter-pills" id="filterPillsContainer">
-            <button class="filter-pill active" data-filter="all">All (4)</button>
-            <button class="filter-pill critical" data-filter="critical">Critical (2)</button>
-            <button class="filter-pill warning" data-filter="warning">Warning (1)</button>
-            <button class="filter-pill safe" data-filter="safe">Safe (1)</button>
-          </div>
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-space-sm flex-shrink-0">
+        <!-- Language Switcher -->
+        <div class="relative">
+          <select id="langSwitcher" class="bg-surface-container-low text-on-surface font-telemetry-code text-telemetry-code px-space-sm py-1 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer pr-space-lg" aria-label="Language Selector">
+            <option value="en">English (EN)</option>
+            <option value="mr">मराठी (MR)</option>
+            <option value="hi">हिंदी (HI)</option>
+          </select>
+          <span class="material-symbols-outlined text-[16px] text-on-surface-variant absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
         </div>
 
-        <div class="village-list" id="villageListContainer">
-          <!-- Rendered dynamically by dashboard.js -->
+        <!-- Rogue Alert Badge -->
+        <div class="flex items-center gap-space-xs px-space-sm py-1 rounded-lg bg-error-container text-on-error-container font-label-tactical text-label-tactical uppercase" id="alertCounterBadge">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-alert-crimson opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-alert-crimson"></span>
+          </span>
+          <span>1 Rogue Alert</span>
         </div>
-      </div>
 
-      <!-- Google OR-Tools Allocation Solver -->
-      <div class="action-box">
-        <div class="panel-header" style="margin-bottom: 0;">
-          <span class="panel-title" style="color: var(--primary-color);">Emergency Logistics Solver</span>
-          <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);">Google OR-Tools CVRP</span>
-        </div>
-        <p class="action-desc">
-          Automate equitable distribution routes. Guarantees 40L per citizen and 70L per bovine, minimizing fleet diesel burn across Sinnar hamlets.
-        </p>
-        <button id="btnAllocate" class="btn btn-primary btn-block">
-          Execute Emergency Dispatch
+        <!-- Exit / Sign Out Button -->
+        <button class="flex items-center gap-space-xs px-space-sm py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all" onclick="window.location.href='index.html'">
+          <span class="material-symbols-outlined text-[16px]">logout</span>
+          <span>Exit</span>
         </button>
-        <div class="solver-result" id="solverResultBox" style="display: none;">
-          <div style="font-weight: 700; color: var(--telemetry-emerald); margin-bottom: 4px;">
-            ✓ OR-Tools Optimal Dispatch Computed
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-            2 Tanker Circuits Generated • 3 Hamlets Allocated • 0 Skipped • -28.4% Diesel Burn
-          </div>
-          <button id="btnExportManifest" class="btn btn-outline btn-sm" style="margin-top: 8px; width: 100%; font-size: 0.72rem; padding: 4px 8px;">
-            📄 Download Route Manifest (.JSON)
-          </button>
+
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
         </div>
       </div>
+    </div>
+  </header>
 
-    </aside>
+  <!-- LEFT FIXED TACTICAL SIDEBAR -->
+  <aside class="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-surface-panel/95 backdrop-blur-xl z-40 flex flex-col justify-between py-space-md border-r border-border-subtle">
+    <div class="flex flex-col gap-space-md">
+      <div class="px-space-lg flex items-center justify-between">
+        <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Tactical Command Units</span>
+        <span class="font-telemetry-code text-telemetry-code text-primary">GRID SEC-04</span>
+      </div>
+      <nav class="px-space-sm flex flex-col gap-space-xs">
+        <a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2 transition-all bg-primary-container text-on-primary-container font-semibold rounded-lg" href="dashboard.html">
+          <span class="material-symbols-outlined text-[20px]">radar</span>
+          <span class="font-body-md text-body-md">Mission Overview</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#cistern-section">
+          <span class="material-symbols-outlined text-[20px]">water_voc</span>
+          <span class="font-body-md text-body-md">Cistern Telemetry</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#fleet-section">
+          <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+          <span class="font-body-md text-body-md">Fleet Route Matrix</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#satellite-section">
+          <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
+          <span class="font-body-md text-body-md">Satellite Drought AI</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all" href="#anomaly-section">
+          <span class="material-symbols-outlined text-[20px]">warning</span>
+          <span class="font-body-md text-body-md">Rogue Deviations</span>
+        </a>
+      </nav>
+    </div>
 
-    <!-- Interactive Geospatial Map Area -->
-    <main class="map-area">
-      <!-- Floating HUD Overlays -->
-      <div class="map-hud-top">
-        <div class="hud-panel">
-          <span class="hud-tag">Operational Sector</span>
-          <span class="hud-value">Ahilyanagar &amp; Sinnar Drought Corridor • Maharashtra (19.25° N, 74.65° E)</span>
+    <!-- Sidebar Bottom Status -->
+    <div class="px-space-md flex flex-col gap-space-sm">
+      <div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+        <div class="flex items-center justify-between font-label-tactical text-label-tactical uppercase text-on-surface-variant">
+          <span>Sync Frequency</span>
+          <span class="text-tertiary">1000ms</span>
         </div>
-        <div class="hud-panel">
-          <span class="hud-tag">Hydro-Telemetry Node</span>
-          <span class="hud-value" style="color: var(--telemetry-emerald);">Copernicus SAR Sentinel-1 + NASA SMAP Synced</span>
+        <div class="flex items-center justify-between font-label-tactical text-label-tactical uppercase text-on-surface-variant">
+          <span>Active Tankers</span>
+          <span class="text-primary">142 / 150</span>
         </div>
-        <div class="hud-panel layer-control-panel">
-          <span class="hud-tag">Active Layers</span>
-          <div class="hud-layer-btns">
-            <button id="toggleVillages" class="layer-pill active" title="Toggle village markers">🏘️ Hamlets</button>
-            <button id="toggleFleet" class="layer-pill active" title="Toggle tanker fleet markers">🚛 Fleet GPS</button>
-            <button id="toggleRogue" class="layer-pill active" title="Toggle diversion alerts">⚠️ Anomalies</button>
-          </div>
-        </div>
-        <div class="hud-panel basemap-control-panel">
-          <span class="hud-tag">Basemap View</span>
-          <div class="hud-layer-btns">
-            <button id="btnSatellite" class="layer-pill active" title="Switch to High-Res Satellite View">🛰️ Satellite View</button>
-            <button id="btnDarkCanvas" class="layer-pill" title="Switch to Dark Tactical Mode">🗺️ Tactical Dark</button>
-            <button id="btnTerrain" class="layer-pill" title="Switch to Topo Terrain">🏔️ Terrain</button>
-          </div>
+        <div class="flex items-center justify-between font-label-tactical text-label-tactical uppercase text-on-surface-variant">
+          <span>Network Latency</span>
+          <span class="text-safe-emerald">24ms</span>
         </div>
       </div>
+      <div class="px-space-sm text-center font-telemetry-code text-telemetry-code text-outline">JalSanjeevani v3.4.1-gov</div>
+    </div>
+  </aside>
 
-      <!-- Legend -->
-      <div class="map-hud-legend">
-        <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Map Telemetry Layers</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--alert-red);"></span> Critical Village (&lt; 24h water)</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--accent-amber);"></span> Warning Village (&lt; 7d water)</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--telemetry-emerald);"></span> Safe Cistern Reserve</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--primary-color);"></span> Active Tanker Fleet GPS</div>
-        <div class="legend-item"><span class="legend-dot" style="background: var(--alert-red); box-shadow: 0 0 6px var(--alert-red);"></span> Rogue Tanker Diversion</div>
+  <!-- MAIN WORKSPACE -->
+  <div class="pl-64">
+    <main class="relative pt-14 w-full bg-surface-base min-h-screen">
+      <div class="flex flex-col w-full">
+        <div class="w-full p-gutter-desktop flex flex-col gap-space-lg">
+
+          <!-- 1. TOP TELEMETRY METRIC STRIP (Bento Grid 5-Column) -->
+          <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-md">
+            
+            <!-- Metric 1: Villages Depleted (CRITICAL) -->
+            <div class="relative overflow-hidden rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col justify-between border border-border-subtle">
+              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-alert-crimson-glow blur-2xl pointer-events-none"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Villages Depleted</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-DEFAULT bg-error-container text-on-error-container font-label-tactical text-[9px] uppercase tracking-wider animate-pulse">
+                  <span class="w-1.5 h-1.5 rounded-full bg-alert-crimson"></span>
+                  Critical
+                </span>
+              </div>
+              <div class="my-space-xs flex items-baseline gap-space-xs z-10">
+                <span id="criticalVillageCount" class="font-telemetry-metric text-telemetry-metric text-alert-crimson tracking-tight font-bold">5</span>
+                <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">/ 15 hamlets</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant font-telemetry-code text-telemetry-code z-10">
+                <span class="text-error font-medium">&lt; 24h statutory reserve</span>
+                <span class="material-symbols-outlined text-alert-crimson text-[16px]">crisis_alert</span>
+              </div>
+              <div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+                <div class="bg-alert-crimson h-full rounded-full" style="width: 82%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 2: Warning Zone (AMBER) -->
+            <div class="relative overflow-hidden rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col justify-between border border-border-subtle">
+              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-warning-amber-glow blur-2xl pointer-events-none"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Warning Zone</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-DEFAULT bg-warning-amber/10 text-warning-amber font-label-tactical text-[9px] uppercase tracking-wider">
+                  7-Day Alert
+                </span>
+              </div>
+              <div class="my-space-xs flex items-baseline gap-space-xs z-10">
+                <span id="warningVillageCount" class="font-telemetry-metric text-telemetry-metric text-warning-amber tracking-tight font-bold">5</span>
+                <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">groundwater depletion</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant font-telemetry-code text-telemetry-code z-10">
+                <span class="text-warning-amber">&lt; 7-day groundwater</span>
+                <span class="material-symbols-outlined text-warning-amber text-[16px]">trending_down</span>
+              </div>
+              <div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+                <div class="bg-warning-amber h-full rounded-full" style="width: 48%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 3: Human Minimum Guaranteed (CYAN) -->
+            <div class="relative overflow-hidden rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col justify-between border border-border-subtle">
+              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-telemetry-cyan-glow blur-2xl pointer-events-none"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Human Minimum</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-DEFAULT bg-primary/10 text-primary font-label-tactical text-[9px] uppercase">
+                  Statutory
+                </span>
+              </div>
+              <div class="my-space-xs flex items-baseline gap-space-xs z-10">
+                <span class="font-telemetry-metric text-telemetry-metric text-primary tracking-tight font-bold">40L</span>
+                <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">/ capita / day</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant font-telemetry-code text-telemetry-code z-10">
+                <span class="text-primary font-medium">100% Guaranteed</span>
+                <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+              </div>
+              <div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+                <div class="bg-primary h-full rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 4: Cattle Statutory Quota (EMERALD) -->
+            <div class="relative overflow-hidden rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col justify-between border border-border-subtle">
+              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-safe-emerald-glow blur-2xl pointer-events-none"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Cattle Quota</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-DEFAULT bg-safe-emerald/10 text-tertiary font-label-tactical text-[9px] uppercase">
+                  Livestock Act
+                </span>
+              </div>
+              <div class="my-space-xs flex items-baseline gap-space-xs z-10">
+                <span class="font-telemetry-metric text-telemetry-metric text-tertiary tracking-tight font-bold">70L</span>
+                <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">/ head / day</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant font-telemetry-code text-telemetry-code z-10">
+                <span class="text-tertiary">Statutory protection</span>
+                <span class="material-symbols-outlined text-tertiary text-[16px]">agriculture</span>
+              </div>
+              <div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+                <div class="bg-tertiary h-full rounded-full" style="width: 94%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 5: Active Tankers Fleet Optimization -->
+            <div class="relative overflow-hidden rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col justify-between border border-border-subtle">
+              <div class="flex items-center justify-between z-10">
+                <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Active Tankers</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-DEFAULT bg-primary-container text-on-primary-container font-label-tactical text-[9px] uppercase">
+                  OR-Tools CVRP
+                </span>
+              </div>
+              <div class="my-space-xs flex items-baseline gap-space-xs z-10">
+                <span class="font-telemetry-metric text-telemetry-metric text-on-surface tracking-tight font-bold">18</span>
+                <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">/ 24 Deployed</span>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant font-telemetry-code text-telemetry-code z-10">
+                <span class="text-tertiary font-semibold">-28.4% Diesel Burn</span>
+                <span class="material-symbols-outlined text-tertiary text-[16px]">speed</span>
+              </div>
+              <div class="w-full bg-surface-container h-1 rounded-full mt-2 overflow-hidden">
+                <div class="bg-secondary-container h-full rounded-full" style="width: 75%"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. CORE WORKSPACE SPLIT (Left Dock + Right Geospatial Canvas) -->
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-space-md items-start">
+            
+            <!-- LEFT INVESTIGATION DOCK (col-span-5) -->
+            <div class="xl:col-span-5 flex flex-col gap-space-md">
+              
+              <!-- 1. Cryptographic Anti-Diversion Feed -->
+              <div class="rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col gap-space-sm relative overflow-hidden border border-border-subtle" id="anomaly-section">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-alert-crimson text-[20px]">gavel</span>
+                    <span class="font-headline-md text-headline-md text-on-surface">Cryptographic Anti-Diversion Feed</span>
+                  </div>
+                  <span class="px-space-xs py-0.5 rounded-DEFAULT bg-error-container text-on-error-container font-label-tactical text-label-tactical uppercase tracking-wider">
+                    1 Active Deviation
+                  </span>
+                </div>
+
+                <!-- Alert Card Rogue -->
+                <div class="p-space-md rounded-lg bg-surface-card flex flex-col gap-space-sm shadow-md border-l-4 border-alert-crimson" id="diversionAlertCard">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-space-xs">
+                      <span class="px-space-xs py-0.5 rounded-DEFAULT bg-alert-crimson text-surface-panel font-label-tactical text-label-tactical uppercase font-bold tracking-wider animate-pulse">
+                        Diversion Anomaly
+                      </span>
+                      <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">Just now</span>
+                    </div>
+                    <span class="font-label-tactical text-label-tactical text-error">GPS Handshake Missing</span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-space-xs">
+                      <span class="font-headline-md text-headline-md text-primary">Tanker #TN-ROGUE</span>
+                      <span class="font-telemetry-code text-telemetry-code text-on-surface-variant">(MH-16-TX-9901)</span>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface alert-desc">
+                      Deviated <strong class="text-alert-crimson font-bold">14km off designated corridor</strong> near Karjat. Private commercial diversion flagged. Digital custody hash broken.
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-space-xs pt-space-xs">
+                    <button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-alert-crimson hover:bg-error text-surface-panel font-label-tactical text-label-tactical uppercase tracking-wider font-bold transition-all shadow-lg shadow-alert-crimson/25 cursor-pointer" id="btnSuspendPayment">
+                      <span class="material-symbols-outlined text-[16px]">lock_reset</span>
+                      <span>Freeze Contractor Escrow</span>
+                    </button>
+                    <button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-all cursor-pointer" id="btnDispatchIntercept" onclick="alert('🚨 RTO Flying Squad & District Police Patrol dispatched to intercept Tanker MH-16-TX-9901.')">
+                      <span class="material-symbols-outlined text-[16px]">send_to_mobile</span>
+                      <span>Dispatch Intercept</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Emergency Logistics Solver (Google OR-Tools CVRP) -->
+              <div class="rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col gap-space-sm border border-border-subtle" id="fleet-section">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-primary text-[20px]">hub</span>
+                    <span class="font-headline-md text-headline-md text-on-surface">Emergency Logistics Solver</span>
+                  </div>
+                  <span class="font-label-tactical text-label-tactical text-tertiary">Google OR-Tools CVRP</span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                  Automate equitable distribution routes. Guarantees 40L per citizen and 70L per bovine, minimizing fleet diesel burn across Sinnar &amp; Ahilyanagar hamlets.
+                </p>
+
+                <!-- Computed Result Block -->
+                <div class="p-space-md rounded-lg bg-surface-card flex flex-col gap-space-xs border border-border-subtle" id="solverResultBox">
+                  <div class="flex items-center gap-space-xs text-tertiary font-label-tactical text-label-tactical uppercase">
+                    <span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+                    <span>OR-Tools Optimal Dispatch Computed</span>
+                  </div>
+                  <div class="font-telemetry-code text-telemetry-code text-on-surface" id="solverResultText">
+                    2 Tanker Circuits Generated • Dynamic Depot Routed • 100% Demand Met • <span class="text-tertiary font-bold">-28.4% Diesel Burn</span>
+                  </div>
+                </div>
+
+                <!-- Solver Actions -->
+                <div class="flex flex-wrap items-center gap-space-xs pt-space-xs">
+                  <button class="flex-1 min-w-[200px] flex items-center justify-center gap-space-xs px-space-md py-2 rounded-lg bg-primary-container text-on-primary-container font-headline-md text-body-md font-bold uppercase tracking-wider hover:opacity-90 shadow-lg shadow-primary-container/25 transition-all cursor-pointer" id="btnAllocate">
+                    <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                    <span>Execute Emergency Dispatch</span>
+                  </button>
+                  <button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-tactical text-label-tactical uppercase tracking-wider transition-all cursor-pointer" id="btnExportManifest">
+                    <span class="material-symbols-outlined text-[16px]">file_download</span>
+                    <span>Manifest (.JSON)</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. Village Scarcity Matrix (Interactive Filter & Live List) -->
+              <div class="rounded-xl bg-surface-panel p-space-md shadow-xl flex flex-col gap-space-sm border border-border-subtle" id="cistern-section">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-secondary text-[20px]">water_drop</span>
+                    <span class="font-headline-md text-headline-md text-on-surface">Village Scarcity Matrix</span>
+                  </div>
+                  <span class="font-telemetry-code text-telemetry-code text-on-surface-variant" id="matrixCounter">15 priority hamlets</span>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full">
+                  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+                  <input class="w-full bg-surface-base text-on-surface font-telemetry-code text-telemetry-code pl-9 pr-space-md py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary transition-all placeholder:text-outline border border-border-subtle" id="villageSearchInput" placeholder="Search village (e.g. Tisgaon, Supa, Khopadi)..." type="text"/>
+                </div>
+
+                <!-- Interactive Filter Chips -->
+                <div class="flex items-center gap-space-xs font-label-tactical text-label-tactical uppercase" id="filterPillsContainer">
+                  <button class="filter-chip px-2.5 py-1 rounded-DEFAULT bg-primary-container text-on-primary-container font-bold cursor-pointer transition-all active" data-filter="all">All (15)</button>
+                  <button class="filter-chip px-2.5 py-1 rounded-DEFAULT bg-surface-container text-on-surface-variant hover:text-on-surface cursor-pointer transition-all" data-filter="critical">Critical (5)</button>
+                  <button class="filter-chip px-2.5 py-1 rounded-DEFAULT bg-surface-container text-on-surface-variant hover:text-on-surface cursor-pointer transition-all" data-filter="warning">Warning (5)</button>
+                  <button class="filter-chip px-2.5 py-1 rounded-DEFAULT bg-surface-container text-on-surface-variant hover:text-on-surface cursor-pointer transition-all" data-filter="safe">Safe (5)</button>
+                </div>
+
+                <!-- Live Dynamic Village List Container -->
+                <div class="flex flex-col gap-space-xs max-h-[380px] overflow-y-auto pr-1" id="villageListContainer">
+                  <!-- Injected dynamically via dashboard.js from Supabase -->
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT GEOSPATIAL COMMAND CANVAS (col-span-7) -->
+            <div class="xl:col-span-7 flex flex-col gap-space-sm" id="satellite-section">
+              
+              <!-- GIS Map Outer Container -->
+              <div class="relative w-full h-[760px] rounded-xl overflow-hidden shadow-2xl bg-surface-container-lowest border border-border-subtle" id="mapWrapper">
+                
+                <!-- True Leaflet Photorealistic Satellite Engine Viewport -->
+                <div id="map" class="w-full h-full absolute inset-0 z-0"></div>
+
+                <!-- TOP FLOATING HUD OVERLAY BAR -->
+                <div class="absolute top-4 left-4 right-4 z-20 flex flex-col gap-2 pointer-events-auto">
+                  
+                  <!-- Sector & Node Telemetry Badge -->
+                  <div class="p-space-sm rounded-lg bg-surface-panel/90 backdrop-blur-md shadow-lg flex flex-wrap items-center justify-between gap-space-xs border border-border-subtle">
+                    <div class="flex items-center gap-space-xs">
+                      <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                      <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Operational Sector:</span>
+                      <span class="font-body-md text-body-md font-bold text-on-surface">Ahilyanagar &amp; Sinnar Drought Corridor • Maharashtra (19.25° N, 74.65° E)</span>
+                    </div>
+                    <div class="flex items-center gap-space-xs font-telemetry-code text-telemetry-code text-tertiary">
+                      <span class="material-symbols-outlined text-[16px]">satellite</span>
+                      <span>Copernicus SAR Sentinel-1 + NASA SMAP Synced</span>
+                    </div>
+                  </div>
+
+                  <!-- Layer & Basemap Floating Controls -->
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    
+                    <!-- Active Layers Switchers -->
+                    <div class="p-1 rounded-lg bg-surface-panel/90 backdrop-blur-md shadow-md flex items-center gap-1 font-label-tactical text-label-tactical uppercase border border-border-subtle">
+                      <span class="px-2 py-1 text-outline">Active Layers:</span>
+                      <button id="toggleVillages" class="layer-toggle-btn px-2.5 py-1 rounded-DEFAULT bg-primary-container text-on-primary-container font-semibold flex items-center gap-1 cursor-pointer transition-all active">
+                        <span>🏘️</span> Hamlets
+                      </button>
+                      <button id="toggleFleet" class="layer-toggle-btn px-2.5 py-1 rounded-DEFAULT bg-primary-container text-on-primary-container font-semibold flex items-center gap-1 cursor-pointer transition-all active">
+                        <span>🚛</span> Fleet GPS
+                      </button>
+                      <button id="toggleRogue" class="layer-toggle-btn px-2.5 py-1 rounded-DEFAULT bg-error-container text-on-error-container font-semibold flex items-center gap-1 cursor-pointer transition-all active">
+                        <span>⚠️</span> Anomalies
+                      </button>
+                    </div>
+
+                    <!-- Basemap Selector -->
+                    <div class="p-1 rounded-lg bg-surface-panel/90 backdrop-blur-md shadow-md flex items-center gap-1 font-label-tactical text-label-tactical uppercase border border-border-subtle">
+                      <button id="btnSatellite" class="basemap-btn px-2.5 py-1 rounded-DEFAULT bg-primary-container text-on-primary-container font-semibold cursor-pointer transition-all flex items-center gap-1 active">
+                        <span>🛰️</span> Satellite
+                      </button>
+                      <button id="btnDarkCanvas" class="basemap-btn px-2.5 py-1 rounded-DEFAULT bg-surface-container text-on-surface-variant hover:text-on-surface cursor-pointer transition-all flex items-center gap-1">
+                        <span>🗺️</span> Tactical Dark
+                      </button>
+                      <button id="btnTerrain" class="basemap-btn px-2.5 py-1 rounded-DEFAULT bg-surface-container text-on-surface-variant hover:text-on-surface cursor-pointer transition-all flex items-center gap-1">
+                        <span>🏔️</span> Terrain
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MAP ZOOM HUD CONTROLS (Top Right) -->
+                <div class="absolute top-24 right-4 z-20 flex flex-col gap-1">
+                  <button id="btnZoomIn" class="w-8 h-8 rounded-DEFAULT bg-surface-panel/90 backdrop-blur-md text-on-surface hover:text-primary flex items-center justify-center shadow-lg transition-all cursor-pointer border border-border-subtle">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                  </button>
+                  <button id="btnZoomOut" class="w-8 h-8 rounded-DEFAULT bg-surface-panel/90 backdrop-blur-md text-on-surface hover:text-primary flex items-center justify-center shadow-lg transition-all cursor-pointer border border-border-subtle">
+                    <span class="material-symbols-outlined text-[18px]">remove</span>
+                  </button>
+                </div>
+
+                <!-- FLOATING MAP TELEMETRY LEGEND (Bottom Right) -->
+                <div class="absolute bottom-4 right-4 z-20 p-space-md rounded-xl bg-surface-panel/95 backdrop-blur-xl shadow-2xl w-64 flex flex-col gap-space-xs border border-border-subtle pointer-events-auto">
+                  <div class="flex items-center justify-between pb-1 border-b border-border-subtle">
+                    <span class="font-label-tactical text-label-tactical uppercase tracking-wider text-outline">Map Telemetry Layers</span>
+                    <span class="material-symbols-outlined text-outline text-[16px]">layers</span>
+                  </div>
+                  <div class="flex flex-col gap-1.5 font-telemetry-code text-body-sm">
+                    <div class="flex items-center gap-space-xs text-on-surface">
+                      <span class="w-2.5 h-2.5 rounded-full bg-alert-crimson shadow-[0_0_6px_#EF4444]"></span>
+                      <span>Critical Village (&lt; 24h water)</span>
+                    </div>
+                    <div class="flex items-center gap-space-xs text-on-surface">
+                      <span class="w-2.5 h-2.5 rounded-full bg-warning-amber shadow-[0_0_6px_#F59E0B]"></span>
+                      <span>Warning Village (&lt; 7d water)</span>
+                    </div>
+                    <div class="flex items-center gap-space-xs text-on-surface">
+                      <span class="w-2.5 h-2.5 rounded-full bg-safe-emerald shadow-[0_0_6px_#10B981]"></span>
+                      <span>Safe Cistern Reserve</span>
+                    </div>
+                    <div class="flex items-center gap-space-xs text-on-surface">
+                      <span class="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_6px_#4cd7f6]"></span>
+                      <span>Active Tanker Fleet GPS</span>
+                    </div>
+                    <div class="flex items-center gap-space-xs text-on-surface">
+                      <span class="w-2.5 h-2.5 rounded-full bg-alert-crimson animate-pulse"></span>
+                      <span class="text-error font-medium">Rogue Tanker Diversion</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MAP FOOTER ATTRIBUTION -->
+                <div class="absolute bottom-2 left-4 z-20 font-telemetry-code text-body-sm text-outline/80 bg-surface-panel/80 px-2 py-0.5 rounded-DEFAULT backdrop-blur-sm pointer-events-none border border-border-subtle">
+                  🛰️ Esri World Imagery • Copernicus SAR Sentinel-1 • NASA SMAP L4
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
       </div>
-
-      <!-- Mobile Sidebar Toggle -->
-      <button class="mobile-sidebar-toggle" id="btnToggleSidebar">
-        📋 View Telemetry &amp; Controls
-      </button>
-
-      <!-- Map Viewport -->
-      <div id="map"></div>
     </main>
-
   </div>
 
-  <!-- Scripts -->
+  <!-- SCRIPTS & ENGINE BINDINGS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
