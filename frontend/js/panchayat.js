@@ -86,6 +86,23 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch(e) {}
 
         console.log("Cryptographic proof of delivery saved to offline storage:", receipt);
+
+        // Sync with Supabase Database & Realtime
+        if (window.JalSupabase) {
+          window.JalSupabase.saveDeliveryReceipt(receipt);
+          // Also update Khopadi village status in Supabase if client active
+          if (window.JalSupabase.client) {
+            window.JalSupabase.client
+              .from('villages')
+              .update({
+                cistern_level: '48%',
+                status: 'warning',
+                hours_remaining: 72
+              })
+              .eq('id', '3')
+              .then(() => console.log("🌊 Village Khopadi cistern status updated in Supabase."));
+          }
+        }
       }, 1100);
     });
   }

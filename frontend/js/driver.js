@@ -60,6 +60,12 @@ document.addEventListener("DOMContentLoaded", () => {
           btnArrived.innerHTML = "Arrival Verified ✓ (Reset)";
           btnArrived.style.background = "linear-gradient(135deg, #10b981, #059669)";
           btnArrived.style.color = "#fff";
+
+          // Sync arrival to Supabase
+          if (window.JalSupabase) {
+            window.JalSupabase.updateTankerLocation("TN-04", 19.90, 74.10, false, "arrived");
+            console.log("🌊 Driver arrival synced to Supabase for Tanker TN-04.");
+          }
         }, 800);
       } else {
         // Reset state for easy demo retesting
@@ -81,6 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
         btnArrived.innerHTML = "Log Arrival Coordinates";
         btnArrived.style.background = "";
         btnArrived.style.color = "";
+
+        // Reset status in Supabase
+        if (window.JalSupabase) {
+          window.JalSupabase.updateTankerLocation("TN-04", 19.88, 74.02, false, "en_route");
+        }
       }
     });
   }

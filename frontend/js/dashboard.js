@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const routeLayer = L.layerGroup().addTo(map);
 
   // 3. Village Distress Dataset (Copernicus Telemetry & Demographics)
-  const villages = [
+  let villages = [
     { 
       id: "1", 
       name: "Pangari", 
@@ -86,41 +86,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const markersMap = {};
 
   // Render Village Heatmap Circles into villageLayer
-  villages.forEach(v => {
-    let color = v.status === "critical" ? "#ef4444" : v.status === "warning" ? "#f59e0b" : "#10b981";
-    let humanDemand = v.population * 40;
-    let cattleDemand = v.cattle * 70;
-    let totalDemand = humanDemand + cattleDemand;
+  function renderVillageMarkers() {
+    villageLayer.clearLayers();
+    Object.keys(markersMap).forEach(key => delete markersMap[key]);
 
-    const circle = L.circle(v.coords, {
-      color: color,
-      fillColor: color,
-      fillOpacity: 0.35,
-      weight: 2,
-      radius: 1400
-    }).bindPopup(`
-      <div style="font-family: Inter, sans-serif; min-width: 210px;">
-        <h4 style="margin: 0 0 4px 0; color: #00e5ff; font-size: 1rem;">${v.name} Village</h4>
-        <div style="margin-bottom: 8px;">
-          <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: ${color}20; color: ${color}; border: 1px solid ${color}50;">
-            ${v.status.toUpperCase()} (${v.hours_remaining}h Reserve)
-          </span>
-        </div>
-        <div style="font-size: 0.8rem; line-height: 1.5; color: #dce2f4;">
-          <p><strong>Cistern Level:</strong> ${v.cistern_level}</p>
-          <p><strong>Aquifer Trend:</strong> ${v.depletion_rate}</p>
-          <p><strong>Humans:</strong> ${v.population.toLocaleString()} (Min ${humanDemand.toLocaleString()}L)</p>
-          <p><strong>Livestock:</strong> ${v.cattle.toLocaleString()} (Min ${cattleDemand.toLocaleString()}L)</p>
-          <p style="margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); color: #00e5ff; font-weight: 600;">
-            Statutory Demand: ${totalDemand.toLocaleString()} L/day
-          </p>
-        </div>
-      </div>
-    `);
+    villages.forEach(v => {
+      let color = v.status === "critical" ? "#ef4444" : v.status === "warning" ? "#f59e0b" : "#10b981";
+      let humanDemand = v.population * 40;
+      let cattleDemand = v.cattle * 70;
+      let totalDemand = humanDemand + cattleDemand;
 
-    circle.addTo(villageLayer);
-    markersMap[v.id] = { circle, coords: v.coords };
-  });
+      const circle = L.circle(v.coords, {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.35,
+        weight: 2,
+        radius: 1400
+      }).bindPopup(`
+        <div style="font-family: Inter, sans-serif; min-width: 210px;">
+          <h4 style="margin: 0 0 4px 0; color: #00e5ff; font-size: 1rem;">${v.name} Village</h4>
+          <div style="margin-bottom: 8px;">
+            <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: ${color}20; color: ${color}; border: 1px solid ${color}50;">
+              ${v.status.toUpperCase()} (${v.hours_remaining}h Reserve)
+            </span>
+          </div>
+          <div style="font-size: 0.8rem; line-height: 1.5; color: #dce2f4;">
+            <p><strong>Cistern Level:</strong> ${v.cistern_level}</p>
+            <p><strong>Aquifer Trend:</strong> ${v.depletion_rate}</p>
+            <p><strong>Humans:</strong> ${v.population.toLocaleString()} (Min ${humanDemand.toLocaleString()}L)</p>
+            <p><strong>Livestock:</strong> ${v.cattle.toLocaleString()} (Min ${cattleDemand.toLocaleString()}L)</p>
+            <p style="margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); color: #00e5ff; font-weight: 600;">
+              Statutory Demand: ${totalDemand.toLocaleString()} L/day
+            </p>
+          </div>
+        </div>
+      `);
+
+      circle.addTo(villageLayer);
+      markersMap[v.id] = { circle, coords: v.coords };
+    });
+  }
+
+  renderVillageMarkers();
 
   // 4. Village Matrix List, Search & Filter Logic
   const villageListContainer = document.getElementById("villageListContainer");
@@ -230,17 +237,19 @@ document.addEventListener("DOMContentLoaded", () => {
     iconAnchor: [10, 10]
   });
 
+  const tankerMarkers = {};
+
   // Depot Marker (Sinnar Central Water Reservoir)
   L.marker(MAP_CENTER, { icon: depotIcon })
     .bindPopup("<b>Sinnar Municipal Reservoir (Depot)</b><br>Bulk Headworks • Cryptographic Gate Validated")
     .addTo(fleetLayer);
 
   // Active Verified Tankers
-  L.marker([19.83, 73.98], { icon: tankerIcon })
+  tankerMarkers['TN-12'] = L.marker([19.83, 73.98], { icon: tankerIcon })
     .bindPopup("<b>Tanker #12 (MH-15-AG-402)</b><br>10,000L • Route: Sinnar ⇄ Pangari<br><span style='color:#10b981;'>Geofence Compliant</span>")
     .addTo(fleetLayer);
 
-  L.marker([19.88, 74.02], { icon: tankerIcon })
+  tankerMarkers['TN-04'] = L.marker([19.88, 74.02], { icon: tankerIcon })
     .bindPopup("<b>Tanker #04 (MH-15-AG-982)</b><br>10,000L • Route: Sinnar ⇄ Khopadi<br><span style='color:#10b981;'>Geofence Compliant</span>")
     .addTo(fleetLayer);
 
@@ -248,8 +257,109 @@ document.addEventListener("DOMContentLoaded", () => {
   const rogueTanker = L.marker([19.75, 74.15], { icon: rogueTankerIcon })
     .bindPopup("<b>ALERT: Tanker #07 (MH-15-TK-889)</b><br><span style='color:#ef4444;'>12km Off-Route Anomaly</span><br>GPS Handshake Missing!")
     .addTo(rogueLayer);
+  tankerMarkers['TN-07'] = rogueTanker;
   
   rogueTanker.openPopup();
+
+  // Supabase Cloud Sync & Realtime Listeners
+  async function initSupabaseIntegration() {
+    const statusBadge = document.getElementById("supabaseStatusBadge");
+    if (!window.JalSupabase || !window.JalSupabase.client) {
+      if (statusBadge) {
+        statusBadge.innerHTML = `<span style="width:7px; height:7px; border-radius:50%; background:#94a3b8; display:inline-block;"></span> Supabase Offline`;
+        statusBadge.style.color = "#94a3b8";
+      }
+      return;
+    }
+
+    try {
+      const test = await window.JalSupabase.checkConnection();
+      if (!test.connected) {
+        if (statusBadge) {
+          statusBadge.innerHTML = `<span style="width:7px; height:7px; border-radius:50%; background:#f59e0b; display:inline-block;"></span> DB Connected (Run SQL)`;
+          statusBadge.style.color = "#f59e0b";
+          statusBadge.title = "Supabase connected. Run supabase_schema.sql in Supabase SQL editor to create tables.";
+        }
+        return;
+      }
+
+      if (statusBadge) {
+        statusBadge.innerHTML = `<span style="width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981; display:inline-block;"></span> Supabase Cloud Active`;
+        statusBadge.style.color = "#10b981";
+      }
+
+      // 1. Fetch villages from Supabase
+      const dbVillages = await window.JalSupabase.getVillages();
+      if (dbVillages && dbVillages.length > 0) {
+        villages = dbVillages.map(v => ({
+          id: v.id,
+          name: v.name,
+          coords: [v.lat, v.lng],
+          status: v.status,
+          population: v.population,
+          cattle: v.cattle,
+          depletion_rate: v.depletion_rate || "-0.0 cm/day",
+          hours_remaining: v.hours_remaining || 24,
+          cistern_level: v.cistern_level || "50%"
+        }));
+        renderVillageMarkers();
+        renderVillageList();
+        console.log("🌊 [JalSanjeevani] Loaded villages from Supabase PostgreSQL:", villages.length);
+      }
+
+      // 2. Fetch tankers from Supabase
+      const dbTankers = await window.JalSupabase.getTankers();
+      if (dbTankers && dbTankers.length > 0) {
+        dbTankers.forEach(t => {
+          if (tankerMarkers[t.id]) {
+            tankerMarkers[t.id].setLatLng([t.lat, t.lng]);
+          }
+        });
+        console.log("🌊 [JalSanjeevani] Loaded tankers from Supabase PostgreSQL:", dbTankers.length);
+      }
+
+      // 3. Realtime listener: Tanker telemetry updates
+      window.JalSupabase.subscribeToTankers((payload) => {
+        const record = payload.new;
+        if (!record) return;
+        if (tankerMarkers[record.id]) {
+          tankerMarkers[record.id].setLatLng([record.lat, record.lng]);
+          tankerMarkers[record.id].setPopupContent(`
+            <b>${record.id} (${record.registration})</b><br>
+            ${record.is_rogue ? "<span style='color:#ef4444;'>Diverted Anomaly</span>" : "<span style='color:#10b981;'>Geofence Compliant</span>"}<br>
+            Target: ${record.target_village || 'Depot'}
+          `);
+        }
+      });
+
+      // 4. Realtime listener: Village status changes
+      window.JalSupabase.subscribeToVillages((payload) => {
+        const record = payload.new;
+        if (!record) return;
+        const idx = villages.findIndex(v => v.id === record.id);
+        if (idx !== -1) {
+          villages[idx] = {
+            id: record.id,
+            name: record.name,
+            coords: [record.lat, record.lng],
+            status: record.status,
+            population: record.population,
+            cattle: record.cattle,
+            depletion_rate: record.depletion_rate,
+            hours_remaining: record.hours_remaining,
+            cistern_level: record.cistern_level
+          };
+          renderVillageMarkers();
+          renderVillageList();
+        }
+      });
+
+    } catch (err) {
+      console.warn("🌊 Supabase data sync warning:", err);
+    }
+  }
+
+  initSupabaseIntegration();
 
   // Layer Toggle Handlers
   const toggleVillages = document.getElementById("toggleVillages");
@@ -301,7 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alertCard.style.background = "rgba(16, 185, 129, 0.08)";
         const desc = alertCard.querySelector(".alert-desc");
         if (desc) {
-          desc.innerHTML = "<span style='color:#10b981; font-weight:600;'>✓ Smart Escrow Frozen on Chain:</span> ₹1,45,000 contractor balance withheld. RTO patrol dispatched to private quarry.";
+          desc.innerHTML = "<span style='color:#10b981; font-weight:600;'>✓ Smart Escrow Frozen in Supabase:</span> ₹1,45,000 contractor balance withheld. RTO patrol dispatched to private quarry.";
         }
       }
       
@@ -310,7 +420,16 @@ document.addEventListener("DOMContentLoaded", () => {
         alertBadge.textContent = "Escrow Frozen";
       }
 
-      rogueTanker.setPopupContent("<b>Tanker #07 (MH-15-TK-889)</b><br><span style='color:#ef4444; font-weight:bold;'>PAYMENT FROZEN & IMPOUND ORDERED</span>");
+      rogueTanker.setPopupContent("<b>Tanker #07 (MH-15-TK-889)</b><br><span style='color:#ef4444; font-weight:bold;'>PAYMENT FROZEN & IMPOUND ORDERED (SUPABASE LOGGED)</span>");
+
+      // Log Escrow Freeze to Supabase
+      if (window.JalSupabase) {
+        window.JalSupabase.saveEscrowAction(
+          "TN-07",
+          "₹1,45,000",
+          "12km Off-Route Anomaly - GPS Handshake Missing. Contractor balance withheld."
+        );
+      }
     });
   }
 
@@ -423,6 +542,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (solverResultBox) {
         solverResultBox.style.display = "block";
+      }
+
+      // Record Dispatch in Supabase
+      if (window.JalSupabase && generatedRouteData) {
+        window.JalSupabase.saveDispatch(generatedRouteData, 455500);
       }
     });
   }

@@ -32,6 +32,11 @@
         <span>Copernicus Sentinel-2: Active</span>
         <span style="opacity: 0.4;">|</span>
         <span id="liveClock" style="font-family: var(--font-mono); color: var(--primary-color);">UTC 00:00:00</span>
+        <span style="opacity: 0.4;">|</span>
+        <span id="supabaseStatusBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #10b981;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; display: inline-block;"></span>
+          Supabase DB Active
+        </span>
       </div>
 
       <!-- Quick Role / App Switcher -->
@@ -203,6 +208,8 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
   <script src="js/lang.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
